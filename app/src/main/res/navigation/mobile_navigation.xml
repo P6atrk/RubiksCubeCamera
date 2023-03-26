@@ -3,23 +3,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@id/navigation_camera">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="hu.szte.rubikscubecamera.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
-
+        android:id="@+id/navigation_camera"
+        android:name="hu.szte.rubikscubecamera.ui.camera.CameraFragment"
+        android:label="@string/camera"
+        tools:layout="@layout/fragment_camera" />
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="hu.szte.rubikscubecamera.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
-
+        android:id="@+id/navigation_solution"
+        android:name="hu.szte.rubikscubecamera.ui.solution.SolutionFragment"
+        android:label="@string/solution"
+        tools:layout="@layout/fragment_solution" />
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="hu.szte.rubikscubecamera.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_cube"
+        android:name="hu.szte.rubikscubecamera.ui.cube.CubeFragment"
+        android:label="@string/cube"
+        tools:layout="@layout/fragment_cube" />
 </navigation>
