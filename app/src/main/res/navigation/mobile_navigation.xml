@@ -8,16 +8,16 @@
     <fragment
         android:id="@+id/navigation_camera"
         android:name="hu.szte.rubikscubecamera.ui.camera.CameraFragment"
-        android:label="@string/camera"
+        android:label="@string/title_camera"
         tools:layout="@layout/fragment_camera" />
     <fragment
         android:id="@+id/navigation_solution"
         android:name="hu.szte.rubikscubecamera.ui.solution.SolutionFragment"
-        android:label="@string/solution"
+        android:label="@string/title_solution"
         tools:layout="@layout/fragment_solution" />
     <fragment
         android:id="@+id/navigation_cube"
         android:name="hu.szte.rubikscubecamera.ui.cube.CubeFragment"
-        android:label="@string/cube"
+        android:label="@string/title_cube"
         tools:layout="@layout/fragment_cube" />
 </navigation>
