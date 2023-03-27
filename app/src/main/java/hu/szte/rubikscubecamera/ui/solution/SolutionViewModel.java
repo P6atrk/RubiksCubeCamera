@@ -6,10 +6,11 @@ import androidx.lifecycle.ViewModel;
 
 public class SolutionViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
+    private String solution = ""; // TODO: osszekotni a megoldassal valahogy
 
     public SolutionViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is solution fragment");
+        mText.setValue(solution);
     }
 
     public LiveData<String> getText() {
