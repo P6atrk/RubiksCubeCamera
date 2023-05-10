@@ -6,13 +6,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  pre_build:
-    name: Change wrapper permissions run
-      run: chmod +x gradlew
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
     steps:
+      - run: chmod +x gradlew
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
