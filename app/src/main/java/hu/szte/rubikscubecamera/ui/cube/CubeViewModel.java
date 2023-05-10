@@ -4,16 +4,27 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class CubeViewModel extends ViewModel {
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-    private final MutableLiveData<String> mText;
+import hu.szte.rubikscubecamera.utils.KociembaImpl;
+
+public class CubeViewModel extends ViewModel {
+    private final MutableLiveData<String> textCube;
 
     public CubeViewModel() {
-        mText = new MutableLiveData<>();
-        mText.setValue("This is cube fragment");
+        textCube = new MutableLiveData<>();
     }
 
-    public LiveData<String> getText() {
-        return mText;
+    public void solveRandomCube() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            String result = KociembaImpl.solveCubeRandom();
+            textCube.postValue(result);
+        });
+    }
+
+    public LiveData<String> getTextCube() {
+        return textCube;
     }
 }
