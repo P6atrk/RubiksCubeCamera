@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id "org.sonarqube" version "3.5.0.2730"
 }
 
 android {
@@ -28,6 +29,14 @@ android {
     }
     buildFeatures {
         viewBinding true
+    }
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "P6atrk_RubiksCubeCamera"
+        property "sonar.organization", "p6atrk"
+        property "sonar.host.url", "https://sonarcloud.io"
     }
 }
 
