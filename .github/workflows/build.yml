@@ -8,7 +8,7 @@ on:
 jobs:
   pre_build:
     name: Change wrapper permissions run
-      run: chmod +x ../../gradlew
+      run: chmod +x gradlew
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
