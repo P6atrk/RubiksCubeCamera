@@ -37,11 +37,12 @@ sonarqube {
         property "sonar.projectKey", "P6atrk_RubiksCubeCamera"
         property "sonar.organization", "p6atrk"
         property "sonar.host.url", "https://sonarcloud.io"
+        property "sonar.exclusions", "src/main/java/cs"
     }
 }
 
 dependencies {
-
+    
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'com.google.android.material:material:1.5.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
