@@ -11,7 +11,7 @@ public class KociembaImpl {
     public static String solveCubeRandom() {
         Search.init();
         String cube = Tools.randomCube();
-        return "cube: " + cube + "\n" + new Search().solution(cube, MAX_DEPTH, PROBE_MAX, PROBE_MIN, VERBOSE);
+        return new Search().solution(cube, MAX_DEPTH, PROBE_MAX, PROBE_MIN, VERBOSE);
     }
 
     public static String solveCube(String cube) {
