@@ -1,5 +1,7 @@
 package hu.szte.rubikscubecamera.ui.cube;
 
+import android.view.View;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -20,11 +22,7 @@ public class CubeViewModel extends ViewModel {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             String result = KociembaImpl.solveCubeRandom();
-            textCube.postValue(result);
+            System.out.println(result); // TODO: kiiratni máshova, mondjuk a megoldáshoz
         });
-    }
-
-    public LiveData<String> getTextCube() {
-        return textCube;
     }
 }
