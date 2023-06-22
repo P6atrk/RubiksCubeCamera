@@ -6,28 +6,28 @@
     android:layout_height="match_parent"
     tools:context=".ui.cube.CubeFragment" >
 
-    <Button
-        android:id="@+id/button_solve_random_cube"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/solve_random_cube"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
-
     <TableLayout
         android:id="@+id/tableLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
 
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/square0"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
 
             <ImageButton
                 android:id="@+id/square1"
@@ -44,6 +44,12 @@
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
                 android:src="@drawable/cube_color_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
 
             <ImageButton
                 android:id="@+id/square3"
@@ -52,12 +58,6 @@
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
                 android:src="@drawable/cube_color_empty" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
 
             <ImageButton
                 android:id="@+id/square4"
@@ -65,7 +65,7 @@
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
+                android:src="@drawable/cube_color_white" />
 
             <ImageButton
                 android:id="@+id/square5"
@@ -73,7 +73,13 @@
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_yellow" />
+                android:src="@drawable/cube_color_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
 
             <ImageButton
                 android:id="@+id/square6"
@@ -82,12 +88,6 @@
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
                 android:src="@drawable/cube_color_empty" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
 
             <ImageButton
                 android:id="@+id/square7"
@@ -104,14 +104,6 @@
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
                 android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square9"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
         </TableRow>
 
         <TableRow
@@ -120,7 +112,7 @@
             android:gravity="center">
 
             <ImageButton
-                android:id="@+id/square10"
+                android:id="@+id/square36"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -128,7 +120,7 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square11"
+                android:id="@+id/square37"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -136,7 +128,15 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square12"
+                android:id="@+id/square38"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square18"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -160,7 +160,7 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square21"
+                android:id="@+id/square9"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -168,7 +168,7 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square28"
+                android:id="@+id/square10"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -176,15 +176,7 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square29"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square30"
+                android:id="@+id/square11"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -198,7 +190,7 @@
             android:gravity="center">
 
             <ImageButton
-                android:id="@+id/square13"
+                android:id="@+id/square39"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -206,7 +198,7 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square14"
+                android:id="@+id/square40"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -214,7 +206,15 @@
                 android:src="@drawable/cube_color_green" />
 
             <ImageButton
-                android:id="@+id/square15"
+                android:id="@+id/square41"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square21"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -227,7 +227,7 @@
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
+                android:src="@drawable/cube_color_red" />
 
             <ImageButton
                 android:id="@+id/square23"
@@ -235,10 +235,10 @@
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_red" />
+                android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square24"
+                android:id="@+id/square12"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -246,15 +246,7 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square31"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square32"
+                android:id="@+id/square13"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -262,7 +254,7 @@
                 android:src="@drawable/cube_color_blue" />
 
             <ImageButton
-                android:id="@+id/square33"
+                android:id="@+id/square14"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -276,7 +268,7 @@
             android:gravity="center">
 
             <ImageButton
-                android:id="@+id/square16"
+                android:id="@+id/square42"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -284,7 +276,7 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square17"
+                android:id="@+id/square43"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -292,7 +284,15 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square18"
+                android:id="@+id/square44"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square24"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -316,8 +316,98 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
+                android:id="@+id/square15"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square16"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square17"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <ImageButton
                 android:id="@+id/square27"
                 android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square28"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square29"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/square30"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square31"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_yellow" />
+
+            <ImageButton
+                android:id="@+id/square32"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/square33"
+                android:layout_width="41dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
@@ -338,14 +428,6 @@
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
                 android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square36"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
         </TableRow>
 
         <TableRow
@@ -354,7 +436,7 @@
             android:gravity="center">
 
             <ImageButton
-                android:id="@+id/square37"
+                android:id="@+id/square53"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -362,132 +444,12 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square38"
+                android:id="@+id/square52"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
                 android:layout_marginBottom="3dp"
                 android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square39"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
-
-            <ImageButton
-                android:id="@+id/square40"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square41"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_orange" />
-
-            <ImageButton
-                android:id="@+id/square42"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
-
-            <ImageButton
-                android:id="@+id/square43"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square44"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square45"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
-
-            <ImageButton
-                android:id="@+id/square46"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square47"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square48"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center">
-
-            <ImageButton
-                android:id="@+id/square49"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_empty" />
-
-            <ImageButton
-                android:id="@+id/square50"
-                android:layout_width="42dp"
-                android:layout_height="42dp"
-                android:layout_marginRight="3dp"
-                android:layout_marginBottom="3dp"
-                android:src="@drawable/cube_color_white" />
 
             <ImageButton
                 android:id="@+id/square51"
@@ -504,7 +466,7 @@
             android:gravity="center">
 
             <ImageButton
-                android:id="@+id/square52"
+                android:id="@+id/square50"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -512,7 +474,29 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square53"
+                android:id="@+id/square49"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_orange" />
+
+            <ImageButton
+                android:id="@+id/square48"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/square47"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -520,7 +504,15 @@
                 android:src="@drawable/cube_color_empty" />
 
             <ImageButton
-                android:id="@+id/square54"
+                android:id="@+id/square46"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginBottom="3dp"
+                android:src="@drawable/cube_color_empty" />
+
+            <ImageButton
+                android:id="@+id/square45"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_marginRight="3dp"
@@ -530,16 +522,49 @@
     </TableLayout>
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
-        android:layout_marginBottom="1dp"
         android:gravity="center"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/button_solve_random_cube"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRandomize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <ImageButton
+            android:id="@+id/colorChangerWhite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:src="@drawable/cube_color_white" />
+
+        <ImageButton
+            android:id="@+id/colorChangerBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:src="@drawable/cube_color_blue" />
+
+        <ImageButton
+            android:id="@+id/colorChangerRed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:src="@drawable/cube_color_red" />
+
+        <ImageButton
+            android:id="@+id/colorChangerEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:src="@drawable/cube_color_empty" />
 
         <ImageButton
             android:id="@+id/colorChangerYellow"
@@ -558,30 +583,6 @@
             android:src="@drawable/cube_color_green" />
 
         <ImageButton
-            android:id="@+id/colorChangerRed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
-            android:src="@drawable/cube_color_red" />
-
-        <Button
-            android:id="@+id/buttonReset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="5dp"
-            android:layout_weight="0.5"
-            android:text="@string/reset" />
-
-        <ImageButton
-            android:id="@+id/colorChangerBlue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:src="@drawable/cube_color_blue" />
-
-        <ImageButton
             android:id="@+id/colorChangerOrange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -589,15 +590,41 @@
             android:layout_weight="1"
             android:src="@drawable/cube_color_orange" />
 
-        <ImageButton
-            android:id="@+id/colorChangerWhite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
-            android:src="@drawable/cube_color_white" />
-
     </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonRandomize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:text="@string/randomize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.83" />
+
+    <Button
+        android:id="@+id/buttonReset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:text="@string/reset"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonRandomize"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <Button
+        android:id="@+id/button_solve_random_cube"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/solve_random_cube"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonReset"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
