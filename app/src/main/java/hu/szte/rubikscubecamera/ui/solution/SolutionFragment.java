@@ -29,7 +29,7 @@ public class SolutionFragment extends Fragment {
 
         final TextView textView = binding.textSolution;
         viewModel.getResult().observe(getViewLifecycleOwner(), res -> {
-            System.out.println("SOLUTION YOOOOO: " + res);
+            System.out.println("SOLUTION: " + res);
             textView.setText(res);
         });
         return root;
