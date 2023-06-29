@@ -19,10 +19,11 @@ public class SolutionFragment extends Fragment {
 
     private FragmentSolutionBinding binding;
 
+    private MainViewModel viewModel;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        MainViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding = FragmentSolutionBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
