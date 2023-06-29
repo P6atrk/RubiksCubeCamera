@@ -24,4 +24,8 @@ public class KociembaImpl {
     public static String randomCube() {
         return Tools.randomCube(new Random());
     }
+
+    public static boolean verifyCube(String cube) {
+        return Tools.verify(cube) == 0;
+    }
 }

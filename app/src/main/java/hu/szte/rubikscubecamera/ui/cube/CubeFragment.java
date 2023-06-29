@@ -17,13 +17,14 @@ import android.widget.ImageButton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import hu.szte.rubikscubecamera.MainViewModel;
 import hu.szte.rubikscubecamera.databinding.FragmentCubeBinding;
 import hu.szte.rubikscubecamera.utils.KociembaImpl;
 
 public class CubeFragment extends Fragment implements View.OnClickListener {
     private FragmentCubeBinding binding;
 
-    private CubeViewModel cubeViewModel;
+    private MainViewModel viewModel;
 
     private final int SQUARE_COUNT = 54;
     private final String SQUARE_NAME = "square";
@@ -40,6 +41,8 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         EMPTY
     }
 
+    private final char[] SIDE_COLORS = new char[] {'U', 'R', 'F', 'D', 'L', 'B', 'E'};
+
     /**
      * going from 0 to 53, contains all of the center square numbers of a cube
      */
@@ -49,20 +52,18 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private ImageButton[] colorChangers;
 
     private Color selectedColor = Color.RED;
-    private String cube;
-
+    private String cube = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        cubeViewModel = new ViewModelProvider(this).get(CubeViewModel.class);
-
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding = FragmentCubeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        final Button buttonSolveCubeRandom = binding.buttonSolveRandomCube;
+        final Button buttonSolveCube = binding.buttonSolveCube;
         final Button buttonReset = binding.buttonReset;
         final Button buttonRandomize = binding.buttonRandomize;
 
-        buttonSolveCubeRandom.setOnClickListener(a -> cubeViewModel.solveRandomCube());
+        buttonSolveCube.setOnClickListener(a -> solveCube(cube));
         buttonReset.setOnClickListener(this);
         buttonRandomize.setOnClickListener(a -> randomizeCube());
 
@@ -80,18 +81,19 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private void randomizeCube() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
-            char[] randomCube = KociembaImpl.randomCube().toCharArray();
-            Color color = Color.EMPTY;
-            for (int i = 0; i < randomCube.length; i++) {
-                switch (randomCube[i]) {
-                    case 'U': color = Color.WHITE; break;
-                    case 'R': color = Color.BLUE; break;
-                    case 'F': color = Color.RED; break;
-                    case 'D': color = Color.YELLOW; break;
-                    case 'L': color = Color.GREEN; break;
-                    case 'B': color = Color.ORANGE; break;
-                }
-                changeColor(squares[i], color);
+            changeCubeAll(KociembaImpl.randomCube());
+        });
+    }
+
+    public void solveCube(String cube) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            if(KociembaImpl.verifyCube(cube)) {
+                String result = KociembaImpl.solveCube(cube);
+                viewModel.setResult(result);
+                System.out.println(result);
+            } else {
+                System.out.println("THIS CUBE IS WRONG:" + cube);
             }
         });
     }
@@ -113,11 +115,31 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         int squareNumber = Integer.parseInt(viewName.split("square")[1]);
         if (!containsValue(CENTER_SQUARE_NUMBERS, squareNumber)) {
             changeColor(view, selectedColor);
+            changeCubeStringAtIndexWithChar(squareNumber, SIDE_COLORS[selectedColor.ordinal()]);
+            System.out.println("YOOOOO: " + cube);
         }
     }
 
     private void onClickColorChanger(String viewName) {
         selectedColor = Color.valueOf(viewName.split("colorChanger")[1].toUpperCase());
+    }
+
+    private void changeCubeAll(String cube) {
+        Color color = Color.EMPTY;
+        for (int i = 0; i < cube.length(); i++) {
+            switch (cube.charAt(i)) {
+                case 'U': color = Color.WHITE; break;
+                case 'R': color = Color.BLUE; break;
+                case 'F': color = Color.RED; break;
+                case 'D': color = Color.YELLOW; break;
+                case 'L': color = Color.GREEN; break;
+                case 'B': color = Color.ORANGE; break;
+                case 'E': color = Color.EMPTY; break;
+            }
+            changeColor(squares[i], color);
+            changeCubeStringAtIndexWithChar(i, SIDE_COLORS[color.ordinal()]);
+        }
+        System.out.println("YOOOOO: " + cube);
     }
 
     /**
@@ -158,10 +180,18 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         return colorChangers;
     }
 
+    /**
+     * changes the one of the cube's chars at the index with the provided char
+     * @param i this is where the character will be changed
+     * @param ch the is the character it will be changed with
+     */
+    private void changeCubeStringAtIndexWithChar(int i, char ch) {
+        cube = cube.substring(0, i) + ch + cube.substring(i + 1);
+    }
 
     /**
      * changes to color of a square to the Color
-     * @param view square
+     * @param view square object
      * @param color Color
      */
     private void changeColor(View view, Color color) {
