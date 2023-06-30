@@ -29,10 +29,7 @@ public class CameraFragment extends Fragment {
     private FragmentCameraBinding binding;
     private ImageView image1;
     private ImageView image2;
-
     private MainViewModel viewModel;
-
-
     private ActivityResultLauncher<Intent> takeImageActivityResultLauncher;
     private ActivityResultLauncher<Intent> browseActivityResultLauncher;
 
@@ -101,12 +98,8 @@ public class CameraFragment extends Fragment {
     }
 
     private void browseImage() {
-        // create an instance of the
-        // intent of the type image
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        // pass the constant to compare it
-        // with the returned requestCode
         browseActivityResultLauncher.launch(intent);
 
     }
