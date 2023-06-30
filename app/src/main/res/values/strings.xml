@@ -117,4 +117,5 @@
     <string name="randomize">Randomize</string>
     <string name="solve_cube">Solve Cube</string>
     <string name="solution_found">Solution found:</string>
+    <string name="generate">Generate</string>
 </resources>

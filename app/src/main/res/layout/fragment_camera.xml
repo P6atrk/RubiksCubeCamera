@@ -9,20 +9,24 @@
     <ImageView
         android:id="@+id/image1"
         android:layout_width="0dp"
-        android:layout_height="320dp"
-        android:src="@drawable/baseline_crop_square_24"
+        android:layout_height="280dp"
+        android:layout_marginBottom="10dp"
+        android:background="#AAAAAA"
+        android:src="@drawable/cube_color_empty"
         android:tag="image1"
         app:layout_constraintBottom_toTopOf="@+id/image2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="1.0"
+        tools:srcCompat="@drawable/cube_color_empty" />
 
     <ImageView
         android:id="@+id/image2"
         android:layout_width="0dp"
-        android:layout_height="320dp"
-        android:src="@drawable/baseline_crop_square_24"
+        android:layout_height="280dp"
+        android:background="#AAAAAA"
+        android:src="@drawable/cube_color_empty"
         android:tag="image2"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +43,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9">
+        app:layout_constraintVertical_bias="0.85">
 
         <ImageButton
             android:id="@+id/buttonCamera"
@@ -60,5 +64,17 @@
             android:src="@drawable/baseline_delete_24" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonGenerate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/generate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
