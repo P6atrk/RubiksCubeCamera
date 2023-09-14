@@ -23,15 +23,9 @@ import hu.szte.rubikscubecamera.utils.KociembaImpl;
 
 public class CubeFragment extends Fragment implements View.OnClickListener {
     private FragmentCubeBinding binding;
-
     private MainViewModel viewModel;
-
-    private final int SQUARE_COUNT = 54;
     private final String SQUARE_NAME = "square";
     private final String COLOR_CHANGER_NAME = "colorChanger";
-    private final String RESET_NAME = "buttonReset";
-
-    private final String CUBE_START_POSITION = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
     private String cubeOld = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
 
     private enum Color {
@@ -79,6 +73,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
 
         return root;
     }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
@@ -105,12 +100,12 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         });
     }
 
-
     @Override
     public void onClick(View view) {
         String viewName = view.getResources().getResourceName(view.getId()).split(":id/")[1];
+        String RESET_NAME = "buttonReset";
         if(viewName.startsWith(SQUARE_NAME)) {
-            onClickSquare(view, viewName);
+            onClickSquare(viewName);
         } else if (viewName.startsWith(COLOR_CHANGER_NAME)) {
             onClickColorChanger(viewName);
         } else if (viewName.equals(RESET_NAME)) {
@@ -118,10 +113,9 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void onClickSquare(View view, String viewName) {
+    private void onClickSquare(String viewName) {
         int squareNumber = Integer.parseInt(viewName.split("square")[1]);
         if (!containsValue(CENTER_SQUARE_NUMBERS, squareNumber)) {
-            //changeColor(view, selectedColor);
             changeCubeStringAtIndexWithChar(squareNumber, SIDE_COLORS[selectedColor.ordinal()]);
         }
     }
@@ -149,17 +143,12 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         cubeOld = viewModel.getCube().getValue();
     }
 
-    /*
-    rákattint
-    változik a cubeString
-    nézi hogy változik-e a cubeString és az alapján változtatja a kinézetet
-     */
-
     /**
      * sets an onClickListener to every square on the screen
      * @return returns the imagebuttons that have an onclicklistener on them
      */
     private ImageButton[] setOnClickListenerForSquares() {
+        int SQUARE_COUNT = 54;
         ImageButton[] squares = new ImageButton[SQUARE_COUNT];
         for (int i = 0; i < squares.length; i++) {
             String squareName = SQUARE_NAME + i;
@@ -220,6 +209,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private void onClickReset() {
         for (int i = 0; i < squares.length; i++) {
             if(!containsValue(CENTER_SQUARE_NUMBERS, i)) {
+                String CUBE_START_POSITION = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
                 viewModel.setCube(CUBE_START_POSITION);
             }
         }
