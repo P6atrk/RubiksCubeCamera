@@ -5,6 +5,9 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertImageViewToMat;
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertMatToBitmap;
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImageForTesting;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,12 +21,23 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +72,7 @@ public class CameraFragment extends Fragment {
         cameraFragmentContainer = binding.cameraFragmentContainer;
         image1 = binding.image1;
         image2 = binding.image2;
+
         ImageButton buttonCamera = binding.buttonCamera;
         ImageButton buttonBrowse = binding.buttonBrowse;
         ImageButton buttonDelete = binding.buttonDelete;
@@ -146,27 +161,31 @@ public class CameraFragment extends Fragment {
     }
 
     private void imageDecoder(ImageView imageView1, ImageView imageView2) {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
+        //ExecutorService executorService = Executors.newSingleThreadExecutor();
+        //executorService.execute(() -> {
             String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
             Mat mat1 = convertImageViewToMat(imageView1);
             Mat mat2 = convertImageViewToMat(imageView2);
 
-            // Do stuff with mat
+            solveImageForTesting(mat1);
+            solveImageForTesting(mat2);
 
-            cubeString = "EUUEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
+            //cubeString = solveImage(mat1) + solveImage(mat2);
 
+            /*
             CubeFragment cubeFragment = new CubeFragment();
 
             Bundle args = new Bundle();
             args.putString("cubeString", cubeString);
             cubeFragment.setArguments(args);
 
-            requireActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, cubeFragment)
-                    .commit();
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, cubeFragment).commit();
+            */
 
             // Draw mat with imageView
+            imageView1.setImageBitmap(convertMatToBitmap(mat1));
+            imageView2.setImageBitmap(convertMatToBitmap(mat2));
+        //});
             //imageView1.setImageBitmap(convertMatToBitmap(mat1));
             //imageView2.setImageBitmap(convertMatToBitmap(mat2));
         });
@@ -180,6 +199,7 @@ public class CameraFragment extends Fragment {
         Utils.bitmapToMat(bitmap8888, mat);
         return mat;
     }
+
 
     private Bitmap convertMatToBitmap(Mat mat) {
         Bitmap bitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
