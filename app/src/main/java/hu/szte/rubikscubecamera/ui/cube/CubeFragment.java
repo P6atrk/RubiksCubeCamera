@@ -71,6 +71,12 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         squares = setOnClickListenerForSquares();
         colorChangers = setOnClickListenerForColorChangers();
 
+        // only "cubeString" is stored in arguments
+        if(getArguments() != null) {
+            String cubeString = getArguments().getString("cubeString");
+            setCubeByImage(cubeString);
+        }
+      
         return root;
     }
 
@@ -84,6 +90,13 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             viewModel.setCube(KociembaImpl.randomCube());
+        });
+    }
+
+    private void setCubeByImage(String cubeString) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            viewModel.setCube(cubeString);
         });
     }
 
