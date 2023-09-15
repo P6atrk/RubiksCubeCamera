@@ -138,7 +138,7 @@ public class CameraFragment extends Fragment {
         Utils.matToBitmap(mat, bitmap);
         return bitmap;
     }
-
+  
     private void setImage(Bitmap bitmap) {
         if (image1.getDrawable() == null) {
             image1.setImageBitmap(bitmap);

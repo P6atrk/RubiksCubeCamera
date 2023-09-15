@@ -76,6 +76,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
             String cubeString = getArguments().getString("cubeString");
             setCubeByImage(cubeString);
         }
+      
         return root;
     }
 
