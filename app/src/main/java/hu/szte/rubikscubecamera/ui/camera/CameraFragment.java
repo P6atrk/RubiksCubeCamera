@@ -164,11 +164,11 @@ public class CameraFragment extends Fragment {
         //ExecutorService executorService = Executors.newSingleThreadExecutor();
         //executorService.execute(() -> {
             String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
-            Mat mat1 = convertImageViewToMat(imageView1);
-            Mat mat2 = convertImageViewToMat(imageView2);
+            Mat mat1 = solveImageForTesting(convertImageViewToMat(imageView1));
+            Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
 
-            solveImageForTesting(mat1);
-            solveImageForTesting(mat2);
+
+
 
             //cubeString = solveImage(mat1) + solveImage(mat2);
 
