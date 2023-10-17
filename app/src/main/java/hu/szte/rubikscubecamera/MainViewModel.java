@@ -4,9 +4,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.io.File;
+
 public class MainViewModel extends ViewModel {
     private final MutableLiveData<String> result = new MutableLiveData<>("");
     private final MutableLiveData<String> cube = new MutableLiveData<>("EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE");
+    //private final MutableLiveData<> image1 = new MutableLiveData<>();
+    //private final MutableLiveData<> image2 = new MutableLiveData<>();
 
     public LiveData<String> getResult() {
         return result;
