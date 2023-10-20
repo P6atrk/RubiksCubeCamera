@@ -3,12 +3,14 @@ package hu.szte.rubikscubecamera.ui.camera;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -28,6 +30,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -62,6 +65,8 @@ public class CaptureFragment extends Fragment {
     private FragmentCaptureBinding binding;
 
     private PreviewView previewView;
+    private SurfaceView surfaceView;
+    private SurfaceHolder surfaceHolder;
     private TextView imageNumber;
     private Button imageCaptureButton;
 
@@ -85,6 +90,32 @@ public class CaptureFragment extends Fragment {
         previewView = binding.previewView;
         imageNumber = binding.imageNumber;
         imageCaptureButton = binding.imageCaptureButton;
+
+        surfaceView = binding.surfaceView;
+        surfaceHolder = surfaceView.getHolder();
+        surfaceView.setZOrderOnTop(true);
+        surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
+
+        surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
+                if(!surfaceHolder.getSurface().isValid()) return;
+
+                Canvas canvas = surfaceHolder.lockCanvas();
+
+                if(canvas == null) return;
+                drawOnCanvas(canvas);
+
+
+                surfaceHolder.unlockCanvasAndPost(canvas);
+            }
+
+            @Override
+            public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {}
+
+            @Override
+            public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {}
+        });
 
         if (allPermissionsGranted()) {
             startCamera();
@@ -171,12 +202,7 @@ public class CaptureFragment extends Fragment {
     private void stopCamera(@NonNull ProcessCameraProvider cameraProvider) {
         cameraProvider.unbindAll();
         System.out.println("ABCD unbindAll");
-
-        CameraFragment cameraFragment = new CameraFragment();
-
-        requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, cameraFragment)
-                .commit();
+        requireActivity().getSupportFragmentManager().popBackStack();
     }
 
     private boolean allPermissionsGranted() {
@@ -187,26 +213,19 @@ public class CaptureFragment extends Fragment {
         }
         return true;
     }
-/*
-    private void drawCubeLines() {
+
+    private void drawOnCanvas(Canvas canvas) {
         Paint linePaint = new Paint();
         linePaint.setColor(Color.rgb(255, 0, 0));
         linePaint.setStrokeWidth(20);
 
-        System.out.println("ABCD:" + surfaceView.getWidth() + ":" + surfaceView.getHeight());
-        Bitmap bitmap = Bitmap.createBitmap(
-                600,
-                600,
-                Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(bitmap);
+        System.out.println("ABCD: DRAWING!");
         canvas.drawColor(0);
         canvas.drawLine(0, 0, 300, 400, linePaint);
-        canvas = surfaceHolder.lockCanvas();
         //canvas.drawLine(300, 0, 300, 400, linePaint);
-        surfaceHolder.unlockCanvasAndPost(canvas);
     }
-*/
+
+
 
     private final ActivityResultLauncher<String[]> requestMultiplePermissionsLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),
