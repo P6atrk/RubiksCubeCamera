@@ -167,9 +167,6 @@ public class CameraFragment extends Fragment {
             Mat mat1 = solveImageForTesting(convertImageViewToMat(imageView1));
             Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
 
-
-
-
             //cubeString = solveImage(mat1) + solveImage(mat2);
 
             /*

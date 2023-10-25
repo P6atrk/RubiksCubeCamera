@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageView;
 
+import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -72,14 +73,13 @@ public class ImageDecoder {
         //cvtColor(mask, mask, COLOR_BGR2GRAY);
         findContours(mask, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
         drawContours(mat, contours, -1, new Scalar(255, 0, 0), 5);
-        drawHelperLines(mat);
+        drawHelperLines(mat, new Scalar(255, 0, 255), 20);
 
         return mat;
     }
 
-    private static void drawHelperLines(Mat mat) {
+    private static void drawHelperLines(Mat mat, Scalar color, int thickness) {
         // w=width, h=height, L=left, R=right, M=middle, U=up, D=down
-
 
         double w = mat.cols();
         double h = mat.rows();
@@ -95,8 +95,6 @@ public class ImageDecoder {
         double hMU = hU + (hM - hU) / 2;
         double hMD = hD - (hD - hM) / 2;
 
-        Scalar color = new Scalar(255, 0, 255);
-        int thickness = 20;
         line(mat, new Point(wL, hMU), new Point(wM, hU), color, thickness);
         line(mat, new Point(wM, hU), new Point(wR, hMU), color, thickness);
         line(mat, new Point(wR, hMU), new Point(wR, hMD), color, thickness);
@@ -107,6 +105,15 @@ public class ImageDecoder {
         line(mat, new Point(wL, hMD), new Point(wL, hMU), color, thickness);
     }
 
+    private void createMask(Mat mat) {
+        Mat mask = new Mat(mat.rows(), mat.cols(), CvType.CV_8U);
+    }
+
+    /**
+     * The ImageView's Bitmap is converted to a OpenCV Mat type.
+     * @param imageView CameraFragment's ImageView's Bitmap will be converted.
+     * @return An OpenCV mat type
+     */
     public static Mat convertImageViewToMat(ImageView imageView) {
         Mat mat = new Mat();
         Bitmap bitmap = ((BitmapDrawable)imageView.getDrawable()).getBitmap();
@@ -116,6 +123,11 @@ public class ImageDecoder {
         return mat;
     }
 
+    /**
+     * Convert a mat to a bitmap exactly.
+     * @param mat OpenCV Mat to be converted
+     * @return A Bitmap that is the same height and width as the mat, just a different data type.
+     */
     public static Bitmap convertMatToBitmap(Mat mat) {
         Bitmap bitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
         Utils.matToBitmap(mat, bitmap);
