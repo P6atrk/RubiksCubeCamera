@@ -63,15 +63,6 @@ public class CameraFragment extends Fragment {
         ImageButton buttonDelete = binding.buttonDelete;
         Button buttonGenerate = binding.buttonGenerate;
 
-        /*takeImageActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-                        setImage(bitmap);
-                    }
-                });*/
-
         browseActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == Activity.RESULT_OK) {
@@ -91,19 +82,18 @@ public class CameraFragment extends Fragment {
                     }
                 });
 
+        requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            System.out.println("ABCD: POPBACKSTACK!!!!");
+            setImages();
+        });
+
 
         buttonCamera.setOnClickListener(image -> takeImage());
         buttonBrowse.setOnClickListener(image -> browseImage());
-        buttonDelete.setOnClickListener(image -> deleteImage());
+        buttonDelete.setOnClickListener(image -> deleteImages());
         buttonGenerate.setOnClickListener(button -> imageDecoder(image1, image2));
 
-        deleteImage();
-
-        List<Bitmap> imageBitmaps = getLastTwoBitmaps();
-        if(!imageBitmaps.isEmpty()) {
-            setImage(imageBitmaps.get(0));
-            setImage(imageBitmaps.get(1));
-        }
+        deleteImages();
         return root;
     }
 
@@ -138,7 +128,7 @@ public class CameraFragment extends Fragment {
             }
 
             for(File file : files) {
-                System.out.println("1234: " + file.getName() + "::" + file.lastModified());
+                System.out.println("12345: " + file.getName() + "::" + file.lastModified());
             }
 
             System.out.println("1234 LARGEST: " + largest.getName() + "::" + largest.lastModified());
@@ -206,6 +196,15 @@ public class CameraFragment extends Fragment {
         System.out.println("ABCD image bitmap set" + bitmap.toString());
     }
 
+    private void setImages() {
+        List<Bitmap> imageBitmaps = getLastTwoBitmaps();
+        deleteImages();
+        if(imageBitmaps.size() == 2) {
+            setImage(imageBitmaps.get(0));
+            setImage(imageBitmaps.get(1));
+        }
+    }
+
     private void takeImage() {
         CaptureFragment captureFragment = new CaptureFragment();
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
@@ -225,10 +224,9 @@ public class CameraFragment extends Fragment {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         browseActivityResultLauncher.launch(intent);
-
     }
 
-    private void deleteImage() {
+    private void deleteImages() {
         image1.setImageResource(0);
         image2.setImageResource(0);
     }

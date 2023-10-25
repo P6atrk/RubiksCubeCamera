@@ -1,5 +1,7 @@
 package hu.szte.rubikscubecamera.ui.camera;
 
+import static org.opencv.imgproc.Imgproc.line;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -45,6 +47,11 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.google.common.util.concurrent.ListenableFuture;
+
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
 
 import java.io.File;
 import java.lang.reflect.Array;
@@ -124,7 +131,6 @@ public class CaptureFragment extends Fragment {
             requestMultiplePermissionsLauncher.launch(REQUIRED_PERMISSIONS);
         }
 
-        requireActivity().getCacheDir().delete();
 
         return root;
     }
@@ -219,13 +225,31 @@ public class CaptureFragment extends Fragment {
         linePaint.setColor(Color.rgb(255, 0, 0));
         linePaint.setStrokeWidth(20);
 
-        System.out.println("ABCD: DRAWING!");
-        canvas.drawColor(0);
-        canvas.drawLine(0, 0, 300, 400, linePaint);
-        //canvas.drawLine(300, 0, 300, 400, linePaint);
+        // w=width, h=height, L=left, R=right, M=middle, U=up, D=down
+        float w = canvas.getWidth();
+        float h = canvas.getHeight();
+        float c = 5f / 7 * w / 2;
+        float d = c * 0.2f;
+
+        float wM = w / 2;
+        float wL = wM - c;
+        float wR = wM + c;
+        float wDL = wM - c + d;
+        float wDR = wM + c - d;
+
+        float hM = h / 2;
+        float hU = hM + c;
+        float hD = hM - c;
+        float hMU = hU + (hM - hU) / 2;
+        float hMD = hD - (hD - hM) / 2.3f;
+
+        canvas.drawLine(wDL, hMU, wM, hU, linePaint);
+        canvas.drawLine(wM, hU, wDR, hMU, linePaint);
+        canvas.drawLine(wDR, hMU, wR, hMD, linePaint);
+        canvas.drawLine(wR, hMD, wM, hD, linePaint);
+        canvas.drawLine(wM, hD, wL, hMD, linePaint);
+        canvas.drawLine(wL, hMD, wDL, hMU, linePaint);
     }
-
-
 
     private final ActivityResultLauncher<String[]> requestMultiplePermissionsLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),

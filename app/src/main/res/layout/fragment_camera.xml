@@ -16,6 +16,7 @@
         android:tag="image1"
         app:layout_constraintBottom_toTopOf="@+id/image2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="250dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.95"
@@ -30,6 +31,7 @@
         android:tag="image2"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_max="250dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.95" />
