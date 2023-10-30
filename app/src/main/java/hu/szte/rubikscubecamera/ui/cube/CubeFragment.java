@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 import hu.szte.rubikscubecamera.MainViewModel;
 import hu.szte.rubikscubecamera.databinding.FragmentCubeBinding;
 import hu.szte.rubikscubecamera.utils.KociembaImpl;
+import hu.szte.rubikscubecamera.utils.SquareInfo;
 
 public class CubeFragment extends Fragment implements View.OnClickListener {
     private FragmentCubeBinding binding;
@@ -27,18 +28,6 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private final String SQUARE_NAME = "square";
     private final String COLOR_CHANGER_NAME = "colorChanger";
     private String cubeOld = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
-
-    private enum Color {
-        WHITE,
-        BLUE,
-        RED,
-        YELLOW,
-        GREEN,
-        ORANGE,
-        EMPTY
-    }
-
-    private final char[] SIDE_COLORS = new char[] {'U', 'R', 'F', 'D', 'L', 'B', 'E'};
 
     /**
      * going from 0 to 53, contains all of the center square numbers of a cube
@@ -48,7 +37,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private ImageButton[] squares;
     private ImageButton[] colorChangers;
 
-    private Color selectedColor = Color.RED;
+    private SquareInfo.Color selectedColor = SquareInfo.Color.RED;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
@@ -129,29 +118,28 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private void onClickSquare(String viewName) {
         int squareNumber = Integer.parseInt(viewName.split("square")[1]);
         if (!containsValue(CENTER_SQUARE_NUMBERS, squareNumber)) {
-            changeCubeStringAtIndexWithChar(squareNumber, SIDE_COLORS[selectedColor.ordinal()]);
+            changeCubeStringAtIndexWithChar(squareNumber, SquareInfo.SIDE_COLORS[selectedColor.ordinal()]);
         }
     }
 
     private void onClickColorChanger(String viewName) {
-        selectedColor = Color.valueOf(viewName.split("colorChanger")[1].toUpperCase());
+        selectedColor = SquareInfo.Color.valueOf(viewName.split("colorChanger")[1].toUpperCase());
     }
 
     private void changeAllSquareColor(String cubeNew) {
-        Color color = Color.EMPTY;
+        SquareInfo.Color color = SquareInfo.Color.EMPTY;
         for (int i = 0; i < cubeNew.length(); i++) {
             if(cubeOld.charAt(i) == cubeNew.charAt(i)) continue;
             switch (cubeNew.charAt(i)) {
-                case 'U': color = Color.WHITE; break;
-                case 'R': color = Color.BLUE; break;
-                case 'F': color = Color.RED; break;
-                case 'D': color = Color.YELLOW; break;
-                case 'L': color = Color.GREEN; break;
-                case 'B': color = Color.ORANGE; break;
-                case 'E': color = Color.EMPTY; break;
+                case 'U': color = SquareInfo.Color.WHITE; break;
+                case 'R': color = SquareInfo.Color.BLUE; break;
+                case 'F': color = SquareInfo.Color.RED; break;
+                case 'D': color = SquareInfo.Color.YELLOW; break;
+                case 'L': color = SquareInfo.Color.GREEN; break;
+                case 'B': color = SquareInfo.Color.ORANGE; break;
+                case 'E': color = SquareInfo.Color.EMPTY; break;
             }
             changeColor(squares[i], color);
-            System.out.println("COLOR CHANGED AT: " + i);
         }
         cubeOld = viewModel.getCube().getValue();
     }
@@ -181,7 +169,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
      * @return colorChanger ImageButtons that have an onclicklistener
      */
     private ImageButton[] setOnClickListenerForColorChangers() {
-        Color[] colors = Color.values();
+        SquareInfo.Color[] colors = SquareInfo.Color.values();
         ImageButton[] colorChangers = new ImageButton[colors.length];
         for (int i = 0; i < colors.length; i++) {
             String colorChangerName = COLOR_CHANGER_NAME + stringToCapitalized(colors[i].name());;
@@ -210,7 +198,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
      * @param view square object
      * @param color Color
      */
-    private void changeColor(View view, Color color) {
+    private void changeColor(View view, SquareInfo.Color color) {
         Context c = getContext();
         int imageColor = c.getResources().getIdentifier("cube_color_" + color.name().toLowerCase(), "drawable", c.getPackageName());
         ((ImageButton) view).setImageResource(imageColor);
