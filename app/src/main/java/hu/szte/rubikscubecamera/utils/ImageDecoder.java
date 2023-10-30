@@ -109,11 +109,27 @@ public class ImageDecoder {
 
     private static String rearrangeColorString(String colorString) {
         // TODO eldönteni hogy 1. vagy 2. kép lesz az
-        StringBuilder str = new StringBuilder();
         int[] urfArrangement = new int[] {15, 26, 16, 25, 17, 24, 12, 23, 13, 22, 14, 21, 9, 20, 10, 19, 8, 11, 18, 5, 7, 4, 2, 6, 1, 3, 0};
         int[] dlbArrangement = new int[] {24, 11, 25, 14, 26, 17, 21, 10, 22, 13, 23, 16, 18, 9, 19, 12, 6, 20, 15, 7, 3, 4, 8, 0, 5, 1, 2};
-        for (int i = 0; i < colorString.length(); i++) {
-            str.append(colorString.charAt(urfArrangement[i]));
+
+        if(true) {
+            return appendFor(colorString, urfArrangement);
+        } else {
+            return appendFor(colorString, dlbArrangement);
+        }
+    }
+
+    /**
+     * Appends a new string with the characters of the ogString. The arrangement dictates with
+     * character is going to be picked from the ogString
+     * @param ogString the Original string, these characters will be picked.
+     * @param arrangement an int array, eg.: [3, 5, 0, 2, 8, 6, 7, 4, 1]
+     * @return A string
+     */
+    private static String appendFor(String ogString, int[] arrangement) {
+        StringBuilder str = new StringBuilder();
+        for (int i : arrangement) {
+            str.append(ogString.charAt(i));
         }
         return str.toString();
     }
