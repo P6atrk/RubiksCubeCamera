@@ -41,12 +41,4 @@ public class SquareInfo {
     public static SquareInfo createSquareInfo() {
         return new SquareInfo();
     }
-
-    public Scalar getColorLowerBound(Color color) {
-        return lowerBounds.get(color.ordinal());
-    }
-
-    public Scalar getColorUpperBound(Color color) {
-        return upperBounds.get(color.ordinal());
-    }
 }

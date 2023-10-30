@@ -77,7 +77,7 @@ public class ImageDecoder {
         List<Mat> matSquares = createMatSquares(mat, squareMasks);
         String colors = getMatSquareColors(matSquares);
         System.out.println("FINALLY!!!" + colors);
-        return cubeMask;
+        return matSquares.get(21);
     }
 
     private static String getMatSquareColors(List<Mat> matSquares) {
@@ -103,7 +103,7 @@ public class ImageDecoder {
             }
             colorString.append(SquareInfo.SIDE_COLORS[biggest]);
         }
-
+        System.out.println("FINAFFF!!!" + colorString.toString());
         return rearrangeColorString(colorString.toString());
     }
 
