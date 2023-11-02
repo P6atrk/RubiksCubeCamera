@@ -1,12 +1,5 @@
 package hu.szte.rubikscubecamera.ui.camera;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProvider;
-import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertImageViewToMat;
-import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertMatToBitmap;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImageForTesting;
 
 import android.app.Activity;
@@ -16,12 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,11 +20,13 @@ import android.widget.ImageView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.content.res.ResourcesCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
 import java.io.File;
@@ -47,13 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import hu.szte.rubikscubecamera.MainViewModel;
-import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCameraBinding;
-import hu.szte.rubikscubecamera.ui.cube.CubeFragment;
-
-import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.Mat;
 
 public class CameraFragment extends Fragment {
     private FragmentCameraBinding binding;
@@ -98,7 +82,6 @@ public class CameraFragment extends Fragment {
                 });
 
         requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> {
-            System.out.println("ABCD: POPBACKSTACK!!!!");
             setImages();
         });
 
@@ -161,8 +144,8 @@ public class CameraFragment extends Fragment {
     }
 
     private void imageDecoder(ImageView imageView1, ImageView imageView2) {
-        //ExecutorService executorService = Executors.newSingleThreadExecutor();
-        //executorService.execute(() -> {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
             String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
             Mat mat1 = solveImageForTesting(convertImageViewToMat(imageView1));
             Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
@@ -182,9 +165,6 @@ public class CameraFragment extends Fragment {
             // Draw mat with imageView
             imageView1.setImageBitmap(convertMatToBitmap(mat1));
             imageView2.setImageBitmap(convertMatToBitmap(mat2));
-        //});
-            //imageView1.setImageBitmap(convertMatToBitmap(mat1));
-            //imageView2.setImageBitmap(convertMatToBitmap(mat2));
         });
     }
 
@@ -216,10 +196,15 @@ public class CameraFragment extends Fragment {
     private void setImages() {
         List<Bitmap> imageBitmaps = getLastTwoBitmaps();
         deleteImages();
+        //Bitmap.createScaledBitmap(imageBitmaps.get(0), 960, 1080, false);
         if(imageBitmaps.size() == 2) {
             setImage(imageBitmaps.get(0));
             setImage(imageBitmaps.get(1));
         }
+    }
+
+    private void cropBitmapToSize() {
+        // TODO a bitmap közepét ki kell vágni a képnek megfelelően
     }
 
     private void takeImage() {

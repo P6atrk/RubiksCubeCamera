@@ -18,6 +18,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.MediaStore;
+import android.util.Rational;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -33,12 +35,14 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
+import androidx.camera.core.impl.ImageCaptureConfig;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
@@ -153,6 +157,7 @@ public class CaptureFragment extends Fragment {
     void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
 
         Preview preview = new Preview.Builder()
+                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                 .build();
 
         CameraSelector cameraSelector = new CameraSelector.Builder()
@@ -162,9 +167,8 @@ public class CaptureFragment extends Fragment {
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                 .build();
 
-        ImageCapture.Builder builder = new ImageCapture.Builder();
-
-        final ImageCapture imageCapture = builder
+        ImageCapture imageCapture = new ImageCapture.Builder()
+                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                 .build();
 
         preview.setSurfaceProvider(previewView.getSurfaceProvider());

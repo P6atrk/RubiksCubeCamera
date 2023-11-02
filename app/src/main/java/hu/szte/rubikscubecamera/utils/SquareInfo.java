@@ -23,19 +23,20 @@ public class SquareInfo {
 
     private SquareInfo() {
         lowerBounds = new ArrayList<>();
-        lowerBounds.add(new Scalar(25, 25, 25));
-        lowerBounds.add(new Scalar(0, 100, 0));
-        lowerBounds.add(new Scalar(0, 0, 50));
-        lowerBounds.add(new Scalar(150, 50, 0));
-        lowerBounds.add(new Scalar(150, 150, 0));
-        lowerBounds.add(new Scalar(180, 180, 180));
+        lowerBounds.add(new Scalar(180, 180, 180));   // White
+        lowerBounds.add(new Scalar(0, 0, 50));       // Blue
+        lowerBounds.add(new Scalar(0, 0, 150));      // Red
+        lowerBounds.add(new Scalar(150, 150, 0));    // Yellow
+        lowerBounds.add(new Scalar(0, 100, 0));      // Green
+        lowerBounds.add(new Scalar(150, 50, 0));     // Orange
+
         upperBounds = new ArrayList<>();
-        upperBounds.add(new Scalar(80, 80, 255));
-        upperBounds.add(new Scalar(50, 255, 50));
-        upperBounds.add(new Scalar(80, 80, 200));
-        upperBounds.add(new Scalar(255, 120, 60));
-        upperBounds.add(new Scalar(255, 255, 80));
-        upperBounds.add(new Scalar(255, 255, 255));
+        upperBounds.add(new Scalar(255, 255, 255));  // White
+        upperBounds.add(new Scalar(80, 80, 200));    // Blue
+        upperBounds.add(new Scalar(80, 80, 255));    // Red
+        upperBounds.add(new Scalar(255, 255, 80));  // Yellow
+        upperBounds.add(new Scalar(50, 255, 50));   // Green
+        upperBounds.add(new Scalar(255, 120, 60));  // Orange
     }
 
     public static SquareInfo createSquareInfo() {

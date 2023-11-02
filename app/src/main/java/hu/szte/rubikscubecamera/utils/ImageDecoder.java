@@ -27,40 +27,6 @@ public class ImageDecoder {
     }
 
     public static Mat solveImageForTesting(Mat mat) {
-        /*Mat mask = Mat.zeros(mat.rows(), mat.cols(), CvType.CV_8U);
-        Mat colorMask = new Mat();
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-
-        ArrayList<Scalar> colorsLower = new ArrayList<>();
-        colorsLower.add(new Scalar(215, 215, 215)); // white
-
-        ArrayList<Scalar> colorsUpper = new ArrayList<>();
-        colorsUpper.add(new Scalar(255, 255, 255)); // white
-        //colorsUpper.add(new Scalar(0, 70, 173)); // blue
-        //colorsUpper.add(new Scalar(183, 18, 52)); // red
-        //colorsUpper.add(new Scalar(255, 213, 0)); // yellow
-        //colorsUpper.add(new Scalar(0, 155, 72)); // green
-        //colorsUpper.add(new Scalar(255, 88, 0)); // orange
-
-        Mat openKernel = getStructuringElement(MORPH_RECT, new Size(7, 7));
-        Mat closeKernel = getStructuringElement(MORPH_RECT, new Size(5, 5));
-
-        //Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGR2HSV);
-
-        for(int i = 0; i < colorsLower.size(); i++) {
-            Core.inRange(mat, colorsLower.get(i), colorsUpper.get(i), colorMask);
-            Imgproc.morphologyEx(colorMask, colorMask, MORPH_OPEN, openKernel, new Point(-1, -1), 1);
-            Imgproc.morphologyEx(colorMask, colorMask, MORPH_CLOSE, closeKernel, new Point(-1, -1), 5);
-            //List<Mat> colorMasks = Arrays.asList(colorMask, colorMask, colorMask);
-            //Core.merge(colorMasks, colorMask);
-            Core.bitwise_or(mask, colorMask, mask);
-        }
-
-        //cvtColor(mask, mask, COLOR_BGR2GRAY);
-        findContours(mask, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-        drawContours(mat, contours, -1, new Scalar(255, 0, 0), 5);
-        drawLines(mat, new Scalar(255, 0, 255), 20);*/
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
         Mat cubeMask = createCubeMask(mat);
 
@@ -73,11 +39,13 @@ public class ImageDecoder {
 
         //drawNumbersOnCubeSquares(cubeMask, contours, hierarchy);
 
-        List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
-        List<Mat> matSquares = createMatSquares(mat, squareMasks);
-        String colors = getMatSquareColors(matSquares);
-        System.out.println("FINALLY!!!" + colors);
-        return matSquares.get(21);
+        //List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
+        //List<Mat> matSquares = createMatSquares(mat, squareMasks);
+        //String colors = getMatSquareColors(matSquares);
+        //System.out.println("FINALLY!!!" + colors);
+        System.out.println("FINALLY!!!" + mat.cols() + "::" + mat.rows());
+        drawOuterLines(mat, new Scalar(255, 255, 0), 10);
+        return mat;
     }
 
     private static String getMatSquareColors(List<Mat> matSquares) {
@@ -121,7 +89,7 @@ public class ImageDecoder {
 
     /**
      * Appends a new string with the characters of the ogString. The arrangement dictates with
-     * character is going to be picked from the ogString
+     * character is going to be picked from the ogString next
      * @param ogString the Original string, these characters will be picked.
      * @param arrangement an int array, eg.: [3, 5, 0, 2, 8, 6, 7, 4, 1]
      * @return A string
@@ -173,6 +141,7 @@ public class ImageDecoder {
     private static void drawInnerLines(Mat mat, Scalar color, int thickness) {
         // w=width, h=height, L=left, R=right, M=middle, U=up, D=down
         double w = mat.cols();
+        double h = mat.rows();
         double c = 5.0 / 7 * w / 2;
         double d = c * 0.2;
         double f1 = 1 / 3.0;
@@ -184,7 +153,7 @@ public class ImageDecoder {
         double wDL = wM - c + d;
         double wDR = wM + c - d;
 
-        double hM = mat.rows() / 2.0;
+        double hM = h / 2.0;
         double hU = hM - c;
         double hD = hM + c;
         double hMD = hD + (hM - hD) / 2;
@@ -225,19 +194,20 @@ public class ImageDecoder {
     private static void drawOuterLines(Mat mat, Scalar color, int thickness) {
         // w=width, h=height, L=left, R=right, M=middle, U=up, D=down
         double w = mat.cols();
-        double c = 5.0 / 7 * w / 2;
+        double h = mat.cols();
+        double c = 5.0 / 7.0 * w / 2.0;
         double d = c * 0.2;
 
-        double wM = w / 2;
+        double wM = w / 2.0;
         double wL = wM - c;
         double wR = wM + c;
         double wDL = wM - c + d;
         double wDR = wM + c - d;
 
-        double hM = mat.rows() / 2.0;
+        double hM = h / 2.0;
         double hU = hM + c;
         double hD = hM - c;
-        double hMU = hU + (hM - hU) / 2;
+        double hMU = hU + (hM - hU) / 2.0;
         double hMD = hD - (hD - hM) / 2.3f;
 
         line(mat, new Point(wDL, hMU), new Point(wM, hU), color, thickness);
@@ -246,6 +216,8 @@ public class ImageDecoder {
         line(mat, new Point(wR, hMD), new Point(wM, hD), color, thickness);
         line(mat, new Point(wM, hD), new Point(wL, hMD), color, thickness);
         line(mat, new Point(wL, hMD), new Point(wDL, hMU), color, thickness);
+
+        line(mat, new Point(wM, hM), new Point(wM, hM), color, thickness);
     }
 
     private static Mat createCubeMask(Mat mat) {
