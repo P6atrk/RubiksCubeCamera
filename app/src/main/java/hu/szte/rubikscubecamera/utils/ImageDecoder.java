@@ -9,9 +9,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
-import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import static org.opencv.imgproc.Imgproc.*;
@@ -44,8 +42,7 @@ public class ImageDecoder {
         //String colors = getMatSquareColors(matSquares);
         //System.out.println("FINALLY!!!" + colors);
         System.out.println("FINALLY!!!" + mat.cols() + "::" + mat.rows());
-        CubeLineDrawer.drawOuterLines(mat, new Scalar(255, 255, 0), 2);
-        CubeLineDrawer.drawInnerLines(mat, new Scalar(0, 255, 0), 10);
+        CubeLineDrawer.drawCubeLines(mat);
         return mat;
     }
 
@@ -143,11 +140,9 @@ public class ImageDecoder {
         Mat mask = Mat.zeros(mat.rows(), mat.cols(), CvType.CV_8UC1);
         List<MatOfPoint> contours = new ArrayList<>();
 
-        CubeLineDrawer.drawOuterLines(mask, new Scalar(255, 255, 255), 2);
+        CubeLineDrawer.drawCubeLines(mat);
         findContours(mask, contours, new Mat(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
         drawContours(mask, contours, -1, new Scalar(255, 255, 255), FILLED);
-
-        CubeLineDrawer.drawInnerLines(mask, new Scalar(0, 0, 0), 2);
 
         return mask;
     }
