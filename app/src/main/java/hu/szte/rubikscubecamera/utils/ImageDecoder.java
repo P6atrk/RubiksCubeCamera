@@ -44,7 +44,8 @@ public class ImageDecoder {
         //String colors = getMatSquareColors(matSquares);
         //System.out.println("FINALLY!!!" + colors);
         System.out.println("FINALLY!!!" + mat.cols() + "::" + mat.rows());
-        drawOuterLines(mat, new Scalar(255, 255, 0), 10);
+        CubeLineDrawer.drawOuterLines(mat, new Scalar(255, 255, 0), 2);
+        CubeLineDrawer.drawInnerLines(mat, new Scalar(0, 255, 0), 10);
         return mat;
     }
 
@@ -138,97 +139,15 @@ public class ImageDecoder {
         return squareMasks;
     }
 
-    private static void drawInnerLines(Mat mat, Scalar color, int thickness) {
-        // w=width, h=height, L=left, R=right, M=middle, U=up, D=down
-        double w = mat.cols();
-        double h = mat.rows();
-        double c = 5.0 / 7 * w / 2;
-        double d = c * 0.2;
-        double f1 = 1 / 3.0;
-        double f2 = 2 / 3.0;
-
-        double wM = w / 2;
-        double wL = wM - c;
-        double wR = wM + c;
-        double wDL = wM - c + d;
-        double wDR = wM + c - d;
-
-        double hM = h / 2.0;
-        double hU = hM - c;
-        double hD = hM + c;
-        double hMD = hD + (hM - hD) / 2;
-        double hMU = hU - (hU - hM) / 2.3f;
-
-        double hC = 2 * hMU - hU;
-
-        // L
-        line(mat, new Point(wL, hMU), new Point(wM, hC), color, thickness);
-        // R
-        line(mat, new Point(wR, hMU), new Point(wM, hC), color, thickness);
-        // D
-        line(mat, new Point(wM, hD), new Point(wM, hC), color, thickness);
-
-        // R Horizontal
-        line(mat, p(wR, wDR, hMU, hMD, f1), p(wM, wM, hC, hD, f1), color, thickness);
-        line(mat, p(wR, wDR, hMU, hMD, f2), p(wM, wM, hC, hD, f2), color, thickness);
-        // L Horizontal
-        line(mat, p(wL, wDL, hMU, hMD, f1), p(wM, wM, hC, hD, f1), color, thickness);
-        line(mat, p(wL, wDL, hMU, hMD, f2), p(wM, wM, hC, hD, f2), color, thickness);
-
-        // L Vertical
-        line(mat, p(wL, wM, hMU, hC, f1), p(wDL, wM, hMD, hD, f1), color, thickness);
-        line(mat, p(wL, wM, hMU, hC, f2), p(wDL, wM, hMD, hD, f2), color, thickness);
-        // R Vertical
-        line(mat, p(wR, wM, hMU, hC, f1), p(wDR, wM, hMD, hD, f1), color, thickness);
-        line(mat, p(wR, wM, hMU, hC, f2), p(wDR, wM, hMD, hD, f2), color, thickness);
-
-        // U Horizontal
-        line(mat, p(wM, wL, hU, hMU, f1), p(wM, wR, hC, hMU, f2), color, thickness);
-        line(mat, p(wM, wL, hU, hMU, f2), p(wM, wR, hC, hMU, f1), color, thickness);
-        // U Vertical
-        line(mat, p(wM, wR, hU, hMU, f1), p(wM, wL, hC, hMU, f2), color, thickness);
-        line(mat, p(wM, wR, hU, hMU, f2), p(wM, wL, hC, hMU, f1), color, thickness);
-
-    }
-
-    private static void drawOuterLines(Mat mat, Scalar color, int thickness) {
-        // w=width, h=height, L=left, R=right, M=middle, U=up, D=down
-        double w = mat.cols();
-        double h = mat.cols();
-        double c = 5.0 / 7.0 * w / 2.0;
-        double d = c * 0.2;
-
-        double wM = w / 2.0;
-        double wL = wM - c;
-        double wR = wM + c;
-        double wDL = wM - c + d;
-        double wDR = wM + c - d;
-
-        double hM = h / 2.0;
-        double hU = hM + c;
-        double hD = hM - c;
-        double hMU = hU + (hM - hU) / 2.0;
-        double hMD = hD - (hD - hM) / 2.3f;
-
-        line(mat, new Point(wDL, hMU), new Point(wM, hU), color, thickness);
-        line(mat, new Point(wM, hU), new Point(wDR, hMU), color, thickness);
-        line(mat, new Point(wDR, hMU), new Point(wR, hMD), color, thickness);
-        line(mat, new Point(wR, hMD), new Point(wM, hD), color, thickness);
-        line(mat, new Point(wM, hD), new Point(wL, hMD), color, thickness);
-        line(mat, new Point(wL, hMD), new Point(wDL, hMU), color, thickness);
-
-        line(mat, new Point(wM, hM), new Point(wM, hM), color, thickness);
-    }
-
     private static Mat createCubeMask(Mat mat) {
         Mat mask = Mat.zeros(mat.rows(), mat.cols(), CvType.CV_8UC1);
         List<MatOfPoint> contours = new ArrayList<>();
 
-        drawOuterLines(mask, new Scalar(255, 255, 255), 1);
+        CubeLineDrawer.drawOuterLines(mask, new Scalar(255, 255, 255), 2);
         findContours(mask, contours, new Mat(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
         drawContours(mask, contours, -1, new Scalar(255, 255, 255), FILLED);
 
-        drawInnerLines(mask, new Scalar(0, 0, 0), 4);
+        CubeLineDrawer.drawInnerLines(mask, new Scalar(0, 0, 0), 2);
 
         return mask;
     }
@@ -275,22 +194,5 @@ public class ImageDecoder {
         Bitmap bitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
         Utils.matToBitmap(mat, bitmap);
         return bitmap;
-    }
-
-    /**
-     * Gets a point between two points (w1, h1) (w2, h2).
-     * The fraction decides where on the line the point is gonna be.
-     * The fraction is calculated from the first point (w1, h1),
-     * so If the fraction is 1/3 than the point will be closer to (w1, h1).
-     *
-     * @param w1 point 1's horizontal position
-     * @param w2 point 2's horizontal position
-     * @param h1 point 1's vertical position
-     * @param h2 point 2's vertical position
-     * @param f  fraction
-     * @return an OpenCv Point
-     */
-    private static Point p(double w1, double w2, double h1, double h2, double f) {
-        return new Point(w1 + f * (w2 - w1), h1 + f * (h2 - h1));
     }
 }

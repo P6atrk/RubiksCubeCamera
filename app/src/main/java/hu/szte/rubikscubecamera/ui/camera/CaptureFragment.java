@@ -42,6 +42,7 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
+import androidx.camera.core.ZoomState;
 import androidx.camera.core.impl.ImageCaptureConfig;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -49,6 +50,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -175,6 +177,8 @@ public class CaptureFragment extends Fragment {
 
         Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis, imageCapture);
 
+        camera.getCameraControl().setLinearZoom(0f);
+
         imageCaptureButton.setOnClickListener(a -> {
 
             SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
@@ -227,7 +231,7 @@ public class CaptureFragment extends Fragment {
     private void drawOnCanvas(Canvas canvas) {
         Paint linePaint = new Paint();
         linePaint.setColor(Color.rgb(255, 0, 0));
-        linePaint.setStrokeWidth(20);
+        linePaint.setStrokeWidth(2);
 
         // w=width, h=height, L=left, R=right, M=middle, U=up, D=down
         float w = canvas.getWidth();
