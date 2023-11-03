@@ -11,112 +11,229 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
 public class CubeLineDrawer {
-    private static double f1, f2, wM, wL, wR, wDL, wDR, hU, hD, hMD, hMU, hC;
+    private static final double MD_LENGTH_FRACTION = 3.0;
+    private static final double F1 = 1.0 / 3.0, F2 = 2.0 / 3.0;
+
+    private static final Paint paint = new Paint();
+
+    private static final Scalar color = new Scalar(255, 255, 255);
+    private static final int thickness = 4;
+
+    private static Point M, D , RU, LU, U, LD, RD;
 
     /**
      * Draws the inner and outer lines of the Rubik's cube on the Mat.
      * This is used for Image decoding. Draws white outer and inner lines on the mat.
+     *
      * @param mat Draws on this Mat.
      */
     public static void drawCubeLines(Mat mat) {
-        Scalar color = new Scalar(255, 255, 255);
-        int thickness = 4;
         calculateLines(mat.cols(), mat.rows());
-        // Outer lines
-        line(mat, new Point(wL, hMU), new Point(wM, hU), color, thickness);
-        line(mat, new Point(wM, hU), new Point(wR, hMU), color, thickness);
-        line(mat, new Point(wR, hMU), new Point(wDR, hMD), color, thickness);
-        line(mat, new Point(wDR, hMD), new Point(wM, hD), color, thickness);
-        line(mat, new Point(wM, hD), new Point(wDL, hMD), color, thickness);
-        line(mat, new Point(wDL, hMD), new Point(wL, hMU), color, thickness);
-        // Inner lines
-        // L
-        line(mat, new Point(wL, hMU), new Point(wM, hC), color, thickness);
-        // R
-        line(mat, new Point(wR, hMU), new Point(wM, hC), color, thickness);
-        // D
-        line(mat, new Point(wM, hD), new Point(wM, hC), color, thickness);
-        // R Horizontal
-        line(mat, p(wR, wDR, hMU, hMD, f1), p(wM, wM, hC, hD, f1), color, thickness);
-        line(mat, p(wR, wDR, hMU, hMD, f2), p(wM, wM, hC, hD, f2), color, thickness);
-        // L Horizontal
-        line(mat, p(wL, wDL, hMU, hMD, f1), p(wM, wM, hC, hD, f1), color, thickness);
-        line(mat, p(wL, wDL, hMU, hMD, f2), p(wM, wM, hC, hD, f2), color, thickness);
-        // L Vertical
-        line(mat, p(wL, wM, hMU, hC, f1), p(wDL, wM, hMD, hD, f1), color, thickness);
-        line(mat, p(wL, wM, hMU, hC, f2), p(wDL, wM, hMD, hD, f2), color, thickness);
-        // R Vertical
-        line(mat, p(wR, wM, hMU, hC, f1), p(wDR, wM, hMD, hD, f1), color, thickness);
-        line(mat, p(wR, wM, hMU, hC, f2), p(wDR, wM, hMD, hD, f2), color, thickness);
-        // U Horizontal
-        line(mat, p(wM, wL, hU, hMU, f1), p(wM, wR, hC, hMU, f2), color, thickness);
-        line(mat, p(wM, wL, hU, hMU, f2), p(wM, wR, hC, hMU, f1), color, thickness);
-        // U Vertical
-        line(mat, p(wM, wR, hU, hMU, f1), p(wM, wL, hC, hMU, f2), color, thickness);
-        line(mat, p(wM, wR, hU, hMU, f2), p(wM, wL, hC, hMU, f1), color, thickness);
+
+        drawOuterLines(mat);
+
+        drawInnerLines(mat);
     }
 
     /**
-     * Draws the Rubik's cube's outer lines on the canvas.
+     * Draws the Rubik's cube's outer and inner lines on the canvas.
      * This function only draws in CaptureFragment and on the PreviewView.
+     *
      * @param canvas Draws lines on this canvas.
      */
     public static void drawCubeLines(Canvas canvas) {
-        Paint paint = new Paint();
-        paint.setColor(Color.rgb(255, 0, 0));
-        paint.setStrokeWidth(2);
+        paint.setColor(Color.rgb(255, 255, 255));
+        paint.setStrokeWidth(4);
+
         calculateLines(canvas.getWidth(), canvas.getHeight());
-        // Outer lines
-        canvas.drawLine((float) wL, (float) hMU, (float) wM, (float) hU, paint);
-        canvas.drawLine((float) wM, (float) hU, (float) wR, (float) hMU, paint);
-        canvas.drawLine((float) wR, (float) hMU, (float) wDR, (float) hMD, paint);
-        canvas.drawLine((float) wDR, (float) hMD, (float) wM, (float) hD, paint);
-        canvas.drawLine((float) wM, (float) hD, (float) wDL, (float) hMD, paint);
-        canvas.drawLine((float) wDL, (float) hMD, (float) wL, (float) hMU, paint);
+
+        drawOuterLines(canvas);
+
+        drawInnerLines(canvas);
+    }
+
+    /**
+     * Draws the outer lines of the cube. Works with Canvas.
+     * @param canvas canvas to draw on.
+     */
+    private static void drawOuterLines(Canvas canvas) {
+        drawLine(canvas, LU, U);
+        drawLine(canvas, LU, LD);
+        drawLine(canvas, RU, U);
+        drawLine(canvas, RU, RD);
+        drawLine(canvas, D, LD);
+        drawLine(canvas, D, RD);
+    }
+
+    /**
+     * Draws the outer lines of the cube. Works with Mat.
+     * @param mat Mat to draw on.
+     */
+    private static void drawOuterLines(Mat mat) {
+        drawLine(mat, M, LU);
+        drawLine(mat, M, RU);
+        drawLine(mat, M, D);
+        drawLine(mat, LU, U);
+        drawLine(mat, LU, LD);
+        drawLine(mat, RU, U);
+        drawLine(mat, RU, RD);
+        drawLine(mat, D, LD);
+        drawLine(mat, D, RD);
+    }
+
+    /**
+     * Draws the inner lines of the cube. Works with Canvas.
+     * @param canvas Canvas to draw on.
+     */
+    private static void drawInnerLines(Canvas canvas) {
+        drawLine(canvas, M, LU);
+        drawLine(canvas, M, RU);
+        drawLine(canvas, M, D);
+        draw2ParalellLines(canvas, LU, LD, M, D);
+        draw2ParalellLines(canvas, LU, M, LD, D);
+        draw2ParalellLines(canvas, M, D, RU, RD);
+        draw2ParalellLines(canvas, M, RU, D, RD);
+        draw2ParalellLines(canvas, LU, U, M, RU);
+        draw2ParalellLines(canvas, LU, M, U, RU);
+    }
+
+    /**
+     * Draws the inner lines of the cube. Works with Mat.
+     * @param mat Mat to draw on.
+     */
+    private static void drawInnerLines(Mat mat) {
+        drawLine(mat, M, LU);
+        drawLine(mat, M, RU);
+        drawLine(mat, M, D);
+        draw2ParalellLines(mat, LU, LD, M, D);
+        draw2ParalellLines(mat, LU, M, LD, D);
+        draw2ParalellLines(mat, M, D, RU, RD);
+        draw2ParalellLines(mat, M, RU, D, RD);
+        draw2ParalellLines(mat, LU, U, M, RU);
+        draw2ParalellLines(mat, LU, M, U, RU);
+    }
+
+    // TODO: Kommentelni es egyszeruseteni
+    /**
+     *
+     * @param canvas
+     * @param p1
+     * @param p2
+     * @param p3
+     * @param p4
+     */
+    private static void draw2ParalellLines(Canvas canvas, Point p1, Point p2, Point p3, Point p4) {
+        drawLine(canvas, f(p1, p2, F1), f(p3, p4, F1));
+        drawLine(canvas, f(p1, p2, F2), f(p3, p4, F2));
+    }
+
+    // TODO: Kommentelni es egyszeruseteni
+    /**
+     *
+     * @param mat
+     * @param p1
+     * @param p2
+     * @param p3
+     * @param p4
+     */
+    private static void draw2ParalellLines(Mat mat, Point p1, Point p2, Point p3, Point p4) {
+        drawLine(mat, f(p1, p2, F1), f(p3, p4, F1));
+        drawLine(mat, f(p1, p2, F2), f(p3, p4, F2));
+    }
+
+    /**
+     * Draws a single line on the Canvas.
+     * @param canvas Canvas to draw on.
+     * @param p1 Point1, Starting point of the line.
+     * @param p2 Point2, Ending point of the line.
+     */
+    private static void drawLine(Canvas canvas, Point p1, Point p2) {
+        canvas.drawLine((float) p1.x, (float) p1.y, (float) p2.x, (float) p2.y, paint);
+    }
+
+    /**
+     * Draws a single line on the Mat.
+     * @param mat Mat to draw on.
+     * @param p1 Point1, Starting point of the line.
+     * @param p2 Point2, Ending point of the line.
+     */
+    private static void drawLine(Mat mat, Point p1, Point p2) {
+        line(mat, p1, p2, color, thickness);
     }
 
     /**
      * Calculates where the lines should be drawn. Uses the width and the height
      * of the Mat/Canvas to calculate all the line ends.
+     *
      * @param w Width of the Mat/Canvas.
      * @param h Height of the Mat/Canvas.
      */
     private static void calculateLines(double w, double h) {
-        // w=width, h=height, L=left, R=right, M=middle, U=up, D=down, C=center
-        double c = 5.0 / 7 * w / 2;
-        double d = c * 0.2;
-        f1 = 1 / 3.0;
-        f2 = 2 / 3.0;
+        double half = 1.0 / 2.0;
 
-        wM = w / 2;
-        wL = wM - c;
-        wR = wM + c;
-        wDL = wM - c + d;
-        wDR = wM + c - d;
+        M = new Point(w / 2, h / 2);
+        D = new Point(M.x, M.y + w / MD_LENGTH_FRACTION);
+        RU = rotatePointAroundPoint(M, D, -120);
+        LU = rotatePointAroundPoint(M, D, 120);
 
-        double hM = h / 2.0;
-        hU = hM - c;
-        hD = hM + c;
-        hMD = hD + (hM - hD) / 2;
-        hMU = hU - (hU - hM) / 2.3f;
+        Point OU = reflectPointAboutLine(M, LU, RU);
+        Point OLD = reflectPointAboutLine(M, LU, D);
+        Point ORD = reflectPointAboutLine(M, RU, D);
 
-        hC = 2 * hMU - hU;
+        U = f(OU, f(M, OU, half), half);
+        LD = f(OLD, f(M, OLD, half), half);
+        RD = f(ORD, f(M, ORD, half), half);
     }
 
     /**
-     * Gets a point between two points (w1, h1) (w2, h2).
+     * Gets a point between two points (x1, y1) (x2, y2).
      * The fraction decides where on the line the point is gonna be.
-     * The fraction is calculated from the first point (w1, h1),
-     * so If the fraction is 1/3 than the point will be closer to (w1, h1).
+     * The fraction is calculated from the first point (x1, y1),
+     * so If the fraction is 1/3 than the point will be closer to (x1, y1).
      *
-     * @param w1 point 1's horizontal position
-     * @param w2 point 2's horizontal position
-     * @param h1 point 1's vertical position
-     * @param h2 point 2's vertical position
+     * @param point1 OpenCv Point point1
+     * @param point2 OpenCv Point point2
      * @param f  fraction
      * @return an OpenCv Point
      */
-    private static Point p(double w1, double w2, double h1, double h2, double f) {
-        return new Point(w1 + f * (w2 - w1), h1 + f * (h2 - h1));
+    private static Point f(Point point1, Point point2, double f) {
+        return new Point(point1.x + f * (point2.x - point1.x), point1.y + f * (point2.y - point1.y));
+    }
+
+    // TODO: Kommentelni es egyszeruseteni
+    /**
+     *
+     * @param pivot
+     * @param point
+     * @param angleDegrees
+     * @return
+     */
+    private static Point rotatePointAroundPoint(Point pivot, Point point, double angleDegrees) {
+        // Convert the angle from degrees to radians
+        double angleRadians = angleDegrees * (Math.PI / 180);
+        double cosTheta = Math.cos(angleRadians);
+        double sinTheta = Math.sin(angleRadians);
+
+        return new Point(
+                (int) (cosTheta * (point.x - pivot.x) - sinTheta * (point.y - pivot.y) + pivot.x),
+                (int) (sinTheta * (point.x - pivot.x) + cosTheta * (point.y - pivot.y) + pivot.y));
+    }
+
+    // TODO: Kommentelni es egyszerusiteni
+    /**
+     *
+     * @param point
+     * @param linePoint1
+     * @param linePoint2
+     * @return
+     */
+    public static Point reflectPointAboutLine(Point point, Point linePoint1, Point linePoint2) {
+        double dx = linePoint2.x - linePoint1.x;
+        double dy = linePoint2.y - linePoint1.y;
+        double a = (dx * dx - dy * dy) / (dx * dx + dy * dy);
+        double b = 2 * dx * dy / (dx * dx + dy * dy);
+        double x = Math.round(a * (point.x - linePoint1.x) + b * (point.y - linePoint1.y) + linePoint1.x);
+        double y = Math.round(b * (point.x - linePoint1.x) - a * (point.y - linePoint1.y) + linePoint1.y);
+        return new Point(x, y);
     }
 }

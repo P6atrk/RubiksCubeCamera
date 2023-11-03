@@ -203,10 +203,6 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    private void cropBitmapToSize() {
-        // TODO a bitmap közepét ki kell vágni a képnek megfelelően
-    }
-
     private void takeImage() {
         CaptureFragment captureFragment = new CaptureFragment();
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
