@@ -1,5 +1,7 @@
 package hu.szte.rubikscubecamera.ui.cube;
 
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImage;
+
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
@@ -7,6 +9,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,10 +18,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import hu.szte.rubikscubecamera.MainViewModel;
+import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCubeBinding;
 import hu.szte.rubikscubecamera.utils.KociembaImpl;
 import hu.szte.rubikscubecamera.utils.SquareInfo;
@@ -36,6 +43,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
 
     private ImageButton[] squares;
     private ImageButton[] colorChangers;
+    private NavController navController;
 
     private SquareInfo.Color selectedColor = SquareInfo.Color.RED;
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -47,6 +55,8 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         final Button buttonSolveCube = binding.buttonSolveCube;
         final Button buttonReset = binding.buttonReset;
         final Button buttonRandomize = binding.buttonRandomize;
+
+        navController = NavHostFragment.findNavController(this);
 
         viewModel.getCube().observe(getViewLifecycleOwner(), cube -> {
             System.out.println("CUBE CREATE: " + cube);
@@ -90,16 +100,24 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void solveCube(String cube) {
+        Callable<String> task = () -> {
+            String result = KociembaImpl.solveCube(cube);
+            viewModel.setResult(result);
+            return result;
+        };
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
+        Future<String> future = executorService.submit(task);
+        try {
+            String result = future.get();
             if(KociembaImpl.verifyCube(cube)) {
-                String result = KociembaImpl.solveCube(cube);
-                viewModel.setResult(result);
+                navController.navigate(R.id.action_navigation_cube_to_navigation_solution);
                 System.out.println("CUBE SOLVED: " + result);
             } else {
-                System.out.println("THIS CUBE IS WRONG:" + cube);
+                System.out.println("CUBE WRONG: " + result);
             }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -20,8 +20,20 @@ import java.util.List;
 public class ImageDecoder {
 
     public static String solveImage(Mat mat) {
-        String cubeHalfString = "";
-        return cubeHalfString;
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
+        Mat cubeMask = createCubeMask(mat);
+
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+
+        findContours(cubeMask, contours, hierarchy, RETR_LIST, CHAIN_APPROX_SIMPLE);
+        cvtColor(cubeMask, cubeMask, COLOR_GRAY2BGR);
+        drawContours(cubeMask, contours, -1, new Scalar(0, 0, 255), 2);
+
+        List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
+        List<Mat> matSquares = createMatSquares(mat, squareMasks);
+
+        return getMatSquareColors(matSquares);
     }
 
     public static String solveImageForTesting(Mat mat) {
@@ -35,7 +47,7 @@ public class ImageDecoder {
         cvtColor(cubeMask, cubeMask, COLOR_GRAY2BGR);
         drawContours(cubeMask, contours, -1, new Scalar(0, 0, 255), 2);
 
-        drawNumbersOnCubeSquares(cubeMask, contours, hierarchy);
+        //drawNumbersOnCubeSquares(cubeMask, contours, hierarchy);
 
         List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
         List<Mat> matSquares = createMatSquares(mat, squareMasks);

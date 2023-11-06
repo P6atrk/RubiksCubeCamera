@@ -1,5 +1,6 @@
 package hu.szte.rubikscubecamera.ui.camera;
 
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImage;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImageForTesting;
 
 import android.app.Activity;
@@ -38,13 +39,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import hu.szte.rubikscubecamera.MainViewModel;
 import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCameraBinding;
 import hu.szte.rubikscubecamera.ui.cube.CubeFragment;
+import hu.szte.rubikscubecamera.utils.ImageDecoder;
 
 public class CameraFragment extends Fragment {
     private FragmentCameraBinding binding;
@@ -142,27 +146,27 @@ public class CameraFragment extends Fragment {
     }
 
     private void imageDecoder(ImageView imageView1, ImageView imageView2) {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
+        Callable<String> task = () -> {
             String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
-            //Mat mat1 = solveImageForTesting(convertImageViewToMat(imageView1));
-            //Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
-            cubeString = solveImageForTesting(convertImageViewToMat(imageView1)) + solveImageForTesting(convertImageViewToMat(imageView2));
-            //cubeString = solveImage(mat1) + solveImage(mat2);
+            cubeString = solveImage(convertImageViewToMat(imageView1)) + solveImage(convertImageViewToMat(imageView2));
             System.out.println("1234: " + cubeString);
-
-            CubeFragment cubeFragment = new CubeFragment();
 
             Bundle args = new Bundle();
             args.putString("cubeString", cubeString);
-            cubeFragment.setArguments(args);
+            return cubeString;
+        };
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<String> future = executorService.submit(task);
+        try {
+            String cubeString = future.get();
+            Bundle bundle = new Bundle();
+            bundle.putString("cubeString", cubeString);
+            navController.navigate(R.id.action_navigation_camera_to_navigation_cube, bundle);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-            navController.navigate(R.id.navigation_cube);
-
-            // Draw mat with imageView
-            //imageView1.setImageBitmap(convertMatToBitmap(mat1));
-            //imageView2.setImageBitmap(convertMatToBitmap(mat2));
-        });
+        executorService.shutdown();
     }
 
     private Mat convertImageViewToMat(ImageView imageView) {
