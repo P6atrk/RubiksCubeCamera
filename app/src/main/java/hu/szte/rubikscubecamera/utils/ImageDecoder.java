@@ -39,13 +39,8 @@ public class ImageDecoder {
 
         List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
         List<Mat> matSquares = createMatSquares(mat, squareMasks);
-        String colors = getMatSquareColors(matSquares);
-        System.out.println("FINALLY!!!" + colors);
 
-        //CubeLineDrawer.drawOuterLines(mat, new Scalar(255, 255, 255), 2);
-        //CubeLineDrawer.drawInnerLines(mat, new Scalar(255, 255, 255), 2);
-        //return matSquares.get(10);
-        return colors;
+        return getMatSquareColors(matSquares);
     }
 
     private static String getMatSquareColors(List<Mat> matSquares) {
@@ -71,7 +66,6 @@ public class ImageDecoder {
             }
             colorString.append(SquareInfo.SIDE_COLORS[biggest]);
         }
-        System.out.println("FINAFFF!!!" + colorString.toString());
         return rearrangeColorString(colorString.toString());
     }
 

@@ -129,13 +129,6 @@ public class CameraFragment extends Fragment {
                     secondLargest = files[i];
                 }
             }
-
-            for(File file : files) {
-                System.out.println("12345: " + file.getName() + "::" + file.lastModified());
-            }
-
-            System.out.println("1234 LARGEST: " + largest.getName() + "::" + largest.lastModified());
-            System.out.println("1234 SECOND_LARGEST: " + secondLargest.getName() + "::" + secondLargest.lastModified());
         }
         if(largest == null || secondLargest == null) {
             return new ArrayList<>();
@@ -156,7 +149,7 @@ public class CameraFragment extends Fragment {
             //Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
             cubeString = solveImageForTesting(convertImageViewToMat(imageView1)) + solveImageForTesting(convertImageViewToMat(imageView2));
             //cubeString = solveImage(mat1) + solveImage(mat2);
-            System.out.println("ASDF: " + cubeString);
+            System.out.println("1234: " + cubeString);
 
             CubeFragment cubeFragment = new CubeFragment();
 
@@ -164,7 +157,7 @@ public class CameraFragment extends Fragment {
             args.putString("cubeString", cubeString);
             cubeFragment.setArguments(args);
 
-
+            navController.navigate(R.id.navigation_cube);
 
             // Draw mat with imageView
             //imageView1.setImageBitmap(convertMatToBitmap(mat1));
@@ -194,7 +187,6 @@ public class CameraFragment extends Fragment {
         } else {
             image2.setImageBitmap(bitmap);
         }
-        System.out.println("ABCD image bitmap set" + bitmap.toString());
     }
 
     private void setImages() {

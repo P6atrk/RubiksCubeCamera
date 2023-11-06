@@ -167,7 +167,6 @@ public class CaptureFragment extends Fragment {
 
             SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
             File file = new File(requireActivity().getCacheDir(), mDateFormat.format(new Date()) + ".jpg");
-            System.out.println("ABCD imagecapture pressed");
 
             ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(file).build();
             imageCapture.takePicture(outputFileOptions, executor, new ImageCapture.OnImageSavedCallback() {
