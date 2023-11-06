@@ -20,10 +20,15 @@ import android.widget.ImageView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
@@ -37,7 +42,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import hu.szte.rubikscubecamera.MainViewModel;
+import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCameraBinding;
+import hu.szte.rubikscubecamera.ui.cube.CubeFragment;
 
 public class CameraFragment extends Fragment {
     private FragmentCameraBinding binding;
@@ -45,6 +52,7 @@ public class CameraFragment extends Fragment {
     private ImageView image2;
     private ActivityResultLauncher<Intent> browseActivityResultLauncher;
     private ConstraintLayout cameraFragmentContainer;
+    private NavController navController;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         OpenCVLoader.initDebug();
@@ -56,6 +64,8 @@ public class CameraFragment extends Fragment {
         cameraFragmentContainer = binding.cameraFragmentContainer;
         image1 = binding.image1;
         image2 = binding.image2;
+
+        navController = NavHostFragment.findNavController(this);
 
         ImageButton buttonCamera = binding.buttonCamera;
         ImageButton buttonBrowse = binding.buttonBrowse;
@@ -81,11 +91,6 @@ public class CameraFragment extends Fragment {
                     }
                 });
 
-        requireActivity().getSupportFragmentManager().addOnBackStackChangedListener(() -> {
-            setImages();
-        });
-
-
         buttonCamera.setOnClickListener(image -> takeImage());
         buttonBrowse.setOnClickListener(image -> browseImage());
         buttonDelete.setOnClickListener(image -> deleteImages());
@@ -97,7 +102,7 @@ public class CameraFragment extends Fragment {
 
     @Override
     public void onResume() {
-        System.out.println("ABCD RESUMED!");
+        setImages();
         super.onResume();
     }
 
@@ -147,24 +152,23 @@ public class CameraFragment extends Fragment {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
-            Mat mat1 = solveImageForTesting(convertImageViewToMat(imageView1));
-            Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
-
+            //Mat mat1 = solveImageForTesting(convertImageViewToMat(imageView1));
+            //Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
+            cubeString = solveImageForTesting(convertImageViewToMat(imageView1)) + solveImageForTesting(convertImageViewToMat(imageView2));
             //cubeString = solveImage(mat1) + solveImage(mat2);
+            System.out.println("ASDF: " + cubeString);
 
-            /*
             CubeFragment cubeFragment = new CubeFragment();
 
             Bundle args = new Bundle();
             args.putString("cubeString", cubeString);
             cubeFragment.setArguments(args);
 
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, cubeFragment).commit();
-            */
+
 
             // Draw mat with imageView
-            imageView1.setImageBitmap(convertMatToBitmap(mat1));
-            imageView2.setImageBitmap(convertMatToBitmap(mat2));
+            //imageView1.setImageBitmap(convertMatToBitmap(mat1));
+            //imageView2.setImageBitmap(convertMatToBitmap(mat2));
         });
     }
 
@@ -204,18 +208,7 @@ public class CameraFragment extends Fragment {
     }
 
     private void takeImage() {
-        CaptureFragment captureFragment = new CaptureFragment();
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-
-        Fragment oldFragment = fragmentManager.findFragmentById(cameraFragmentContainer.getId());
-        if (oldFragment != null) {
-            fragmentManager.beginTransaction().remove(oldFragment).commit();
-        }
-
-        fragmentManager.beginTransaction()
-                .replace(cameraFragmentContainer.getId(), captureFragment)
-                .addToBackStack(null)
-                .commit();
+        navController.navigate(R.id.action_navigation_camera_to_navigation_capture);
     }
 
     private void browseImage() {

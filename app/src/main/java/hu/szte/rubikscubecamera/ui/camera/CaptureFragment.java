@@ -35,6 +35,8 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -62,6 +64,7 @@ public class CaptureFragment extends Fragment {
     private SurfaceHolder surfaceHolder;
     private TextView imageNumber;
     private Button imageCaptureButton;
+    private NavController navController;
 
     private Executor executor = Executors.newSingleThreadExecutor();
 
@@ -84,6 +87,8 @@ public class CaptureFragment extends Fragment {
         imageNumber = binding.imageNumber;
         imageCaptureButton = binding.imageCaptureButton;
 
+        navController = NavHostFragment.findNavController(this);
+
         surfaceView = binding.surfaceView;
         surfaceHolder = surfaceView.getHolder();
         surfaceView.setZOrderOnTop(true);
@@ -97,7 +102,8 @@ public class CaptureFragment extends Fragment {
                 Canvas canvas = surfaceHolder.lockCanvas();
 
                 if(canvas == null) return;
-                CubeLineDrawer.drawCubeLines(canvas);
+                CubeLineDrawer.drawInnerLines(canvas);
+                CubeLineDrawer.drawOuterLines(canvas);
 
                 surfaceHolder.unlockCanvasAndPost(canvas);
             }
@@ -136,7 +142,6 @@ public class CaptureFragment extends Fragment {
     }
 
     void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
-
         Preview preview = new Preview.Builder()
                 .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                 .build();
@@ -194,8 +199,7 @@ public class CaptureFragment extends Fragment {
 
     private void stopCamera(@NonNull ProcessCameraProvider cameraProvider) {
         cameraProvider.unbindAll();
-        System.out.println("ABCD unbindAll");
-        requireActivity().getSupportFragmentManager().popBackStack();
+        navController.popBackStack();
     }
 
     private boolean allPermissionsGranted() {
