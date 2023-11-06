@@ -24,7 +24,7 @@ public class ImageDecoder {
         return cubeHalfString;
     }
 
-    public static Mat solveImageForTesting(Mat mat) {
+    public static String solveImageForTesting(Mat mat) {
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
         Mat cubeMask = createCubeMask(mat);
 
@@ -35,15 +35,17 @@ public class ImageDecoder {
         cvtColor(cubeMask, cubeMask, COLOR_GRAY2BGR);
         drawContours(cubeMask, contours, -1, new Scalar(0, 0, 255), 2);
 
-        //drawNumbersOnCubeSquares(cubeMask, contours, hierarchy);
+        drawNumbersOnCubeSquares(cubeMask, contours, hierarchy);
 
-        //List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
-        //List<Mat> matSquares = createMatSquares(mat, squareMasks);
-        //String colors = getMatSquareColors(matSquares);
-        //System.out.println("FINALLY!!!" + colors);
-        System.out.println("FINALLY!!!" + mat.cols() + "::" + mat.rows());
-        CubeLineDrawer.drawCubeLines(mat);
-        return mat;
+        List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
+        List<Mat> matSquares = createMatSquares(mat, squareMasks);
+        String colors = getMatSquareColors(matSquares);
+        System.out.println("FINALLY!!!" + colors);
+
+        //CubeLineDrawer.drawOuterLines(mat, new Scalar(255, 255, 255), 2);
+        //CubeLineDrawer.drawInnerLines(mat, new Scalar(255, 255, 255), 2);
+        //return matSquares.get(10);
+        return colors;
     }
 
     private static String getMatSquareColors(List<Mat> matSquares) {
@@ -74,11 +76,18 @@ public class ImageDecoder {
     }
 
     private static String rearrangeColorString(String colorString) {
-        // TODO eldönteni hogy 1. vagy 2. kép lesz az
-        int[] urfArrangement = new int[] {15, 26, 16, 25, 17, 24, 12, 23, 13, 22, 14, 21, 9, 20, 10, 19, 8, 11, 18, 5, 7, 4, 2, 6, 1, 3, 0};
-        int[] dlbArrangement = new int[] {24, 11, 25, 14, 26, 17, 21, 10, 22, 13, 23, 16, 18, 9, 19, 12, 6, 20, 15, 7, 3, 4, 8, 0, 5, 1, 2};
+        // U1 U2 ... U9 R1 ... R9 F1 ... F9 D1 ... D9 L1 ... L9 B1 ... B9
+        // TODO: eldönteni hogy 1. vagy 2. kép lesz az
+        int[] urfArrangement = new int[] {
+                26, 24, 22, 25, 21, 17, 23, 18, 14,
+                10, 15, 19, 4, 8, 13, 0, 2, 7,
+                20, 16, 11, 12, 9, 5, 6, 3, 1};
+        int[] dlbArrangement = new int[] {
+                26, 24, 22, 25, 21, 17, 23, 18, 14,
+                1, 3, 6, 5, 9, 12, 11, 16, 20,
+                7, 2, 0, 13, 8, 4, 19, 15, 10};
 
-        if(true) {
+        if(colorString.charAt(9) == 'F') {
             return appendFor(colorString, urfArrangement);
         } else {
             return appendFor(colorString, dlbArrangement);
@@ -136,13 +145,19 @@ public class ImageDecoder {
         return squareMasks;
     }
 
+    /**
+     * Creates a mask where the only white parts are the squares on the cube.
+     * @param mat OpenCv mat, mask will be the same height and width as this mat.
+     * @return A 1 channel mask with the same dims as mat.
+     */
     private static Mat createCubeMask(Mat mat) {
         Mat mask = Mat.zeros(mat.rows(), mat.cols(), CvType.CV_8UC1);
         List<MatOfPoint> contours = new ArrayList<>();
 
-        CubeLineDrawer.drawCubeLines(mat);
+        CubeLineDrawer.drawOuterLines(mask, new Scalar(255, 255, 255), 1);
         findContours(mask, contours, new Mat(), RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
         drawContours(mask, contours, -1, new Scalar(255, 255, 255), FILLED);
+        CubeLineDrawer.drawInnerLines(mask, new Scalar(0, 0, 0), 4);
 
         return mask;
     }

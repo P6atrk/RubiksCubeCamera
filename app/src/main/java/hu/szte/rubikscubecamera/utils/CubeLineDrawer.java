@@ -16,47 +16,21 @@ public class CubeLineDrawer {
 
     private static final Paint paint = new Paint();
 
-    private static final Scalar color = new Scalar(255, 255, 255);
-    private static final int thickness = 4;
+    private static Scalar color;
+    private static int thickness = 40;
 
     private static Point M, D , RU, LU, U, LD, RD;
-
-    /**
-     * Draws the inner and outer lines of the Rubik's cube on the Mat.
-     * This is used for Image decoding. Draws white outer and inner lines on the mat.
-     *
-     * @param mat Draws on this Mat.
-     */
-    public static void drawCubeLines(Mat mat) {
-        calculateLines(mat.cols(), mat.rows());
-
-        drawOuterLines(mat);
-
-        drawInnerLines(mat);
-    }
-
-    /**
-     * Draws the Rubik's cube's outer and inner lines on the canvas.
-     * This function only draws in CaptureFragment and on the PreviewView.
-     *
-     * @param canvas Draws lines on this canvas.
-     */
-    public static void drawCubeLines(Canvas canvas) {
-        paint.setColor(Color.rgb(255, 255, 255));
-        paint.setStrokeWidth(4);
-
-        calculateLines(canvas.getWidth(), canvas.getHeight());
-
-        drawOuterLines(canvas);
-
-        drawInnerLines(canvas);
-    }
 
     /**
      * Draws the outer lines of the cube. Works with Canvas.
      * @param canvas canvas to draw on.
      */
-    private static void drawOuterLines(Canvas canvas) {
+    public static void drawOuterLines(Canvas canvas) {
+        paint.setColor(Color.rgb(255, 255, 255));
+        paint.setStrokeWidth(4);
+
+        calculateLines(canvas.getWidth(), canvas.getHeight());
+
         drawLine(canvas, LU, U);
         drawLine(canvas, LU, LD);
         drawLine(canvas, RU, U);
@@ -69,7 +43,12 @@ public class CubeLineDrawer {
      * Draws the outer lines of the cube. Works with Mat.
      * @param mat Mat to draw on.
      */
-    private static void drawOuterLines(Mat mat) {
+    public static void drawOuterLines(Mat mat, Scalar color, int thickness) {
+        CubeLineDrawer.color = color;
+        CubeLineDrawer.thickness = thickness;
+
+        calculateLines(mat.cols(), mat.rows());
+
         drawLine(mat, M, LU);
         drawLine(mat, M, RU);
         drawLine(mat, M, D);
@@ -85,33 +64,44 @@ public class CubeLineDrawer {
      * Draws the inner lines of the cube. Works with Canvas.
      * @param canvas Canvas to draw on.
      */
-    private static void drawInnerLines(Canvas canvas) {
+    public static void drawInnerLines(Canvas canvas) {
+        paint.setColor(Color.rgb(255, 255, 255));
+        paint.setStrokeWidth(4);
+
+        calculateLines(canvas.getWidth(), canvas.getHeight());
+
         drawLine(canvas, M, LU);
         drawLine(canvas, M, RU);
         drawLine(canvas, M, D);
-        draw2ParalellLines(canvas, LU, LD, M, D);
-        draw2ParalellLines(canvas, LU, M, LD, D);
-        draw2ParalellLines(canvas, M, D, RU, RD);
-        draw2ParalellLines(canvas, M, RU, D, RD);
-        draw2ParalellLines(canvas, LU, U, M, RU);
-        draw2ParalellLines(canvas, LU, M, U, RU);
+        draw2ParallelLines(canvas, LU, LD, M, D);
+        draw2ParallelLines(canvas, LU, M, LD, D);
+        draw2ParallelLines(canvas, M, D, RU, RD);
+        draw2ParallelLines(canvas, M, RU, D, RD);
+        draw2ParallelLines(canvas, LU, U, M, RU);
+        draw2ParallelLines(canvas, LU, M, U, RU);
     }
 
     /**
      * Draws the inner lines of the cube. Works with Mat.
      * @param mat Mat to draw on.
      */
-    private static void drawInnerLines(Mat mat) {
+    public static void drawInnerLines(Mat mat, Scalar color, int thickness) {
+        CubeLineDrawer.color = color;
+        CubeLineDrawer.thickness = thickness;
+
+        calculateLines(mat.cols(), mat.rows());
+
         drawLine(mat, M, LU);
         drawLine(mat, M, RU);
         drawLine(mat, M, D);
-        draw2ParalellLines(mat, LU, LD, M, D);
-        draw2ParalellLines(mat, LU, M, LD, D);
-        draw2ParalellLines(mat, M, D, RU, RD);
-        draw2ParalellLines(mat, M, RU, D, RD);
-        draw2ParalellLines(mat, LU, U, M, RU);
-        draw2ParalellLines(mat, LU, M, U, RU);
+        draw2ParallelLines(mat, LU, LD, M, D);
+        draw2ParallelLines(mat, LU, M, LD, D);
+        draw2ParallelLines(mat, M, D, RU, RD);
+        draw2ParallelLines(mat, M, RU, D, RD);
+        draw2ParallelLines(mat, LU, U, M, RU);
+        draw2ParallelLines(mat, LU, M, U, RU);
     }
+
 
     // TODO: Kommentelni es egyszeruseteni
     /**
@@ -122,7 +112,7 @@ public class CubeLineDrawer {
      * @param p3
      * @param p4
      */
-    private static void draw2ParalellLines(Canvas canvas, Point p1, Point p2, Point p3, Point p4) {
+    private static void draw2ParallelLines(Canvas canvas, Point p1, Point p2, Point p3, Point p4) {
         drawLine(canvas, f(p1, p2, F1), f(p3, p4, F1));
         drawLine(canvas, f(p1, p2, F2), f(p3, p4, F2));
     }
@@ -136,7 +126,7 @@ public class CubeLineDrawer {
      * @param p3
      * @param p4
      */
-    private static void draw2ParalellLines(Mat mat, Point p1, Point p2, Point p3, Point p4) {
+    private static void draw2ParallelLines(Mat mat, Point p1, Point p2, Point p3, Point p4) {
         drawLine(mat, f(p1, p2, F1), f(p3, p4, F1));
         drawLine(mat, f(p1, p2, F2), f(p3, p4, F2));
     }
