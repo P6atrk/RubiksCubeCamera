@@ -2,6 +2,7 @@ package hu.szte.rubikscubecamera.ui.cube;
 
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImage;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Context;
@@ -35,6 +36,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private final String SQUARE_NAME = "square";
     private final String COLOR_CHANGER_NAME = "colorChanger";
     private String cubeOld = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
+    private ConstraintLayout constraintLayout;
 
     /**
      * going from 0 to 53, contains all of the center square numbers of a cube
@@ -55,6 +57,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         final Button buttonSolveCube = binding.buttonSolveCube;
         final Button buttonReset = binding.buttonReset;
         final Button buttonRandomize = binding.buttonRandomize;
+        constraintLayout = binding.cubeFragmentContrainstLayout;
 
         navController = NavHostFragment.findNavController(this);
 
@@ -100,24 +103,20 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     }
 
     public void solveCube(String cube) {
-        Callable<String> task = () -> {
-            String result = KociembaImpl.solveCube(cube);
-            viewModel.setResult(result);
-            return result;
-        };
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<String> future = executorService.submit(task);
-        try {
-            String result = future.get();
+        executorService.execute(() -> {
+            String result = KociembaImpl.solveCube(cube);
             if(KociembaImpl.verifyCube(cube)) {
-                navController.navigate(R.id.action_navigation_cube_to_navigation_solution);
-                System.out.println("CUBE SOLVED: " + result);
+                constraintLayout.post(() -> {
+                    viewModel.setResult(result);
+                    navController.navigate(R.id.action_navigation_cube_to_navigation_solution);
+                    System.out.println("CUBE SOLVED: " + result);
+                });
             } else {
-                System.out.println("CUBE WRONG: " + result);
+                    System.out.println("CUBE WRONG: " + result);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
+
     }
 
     @Override
