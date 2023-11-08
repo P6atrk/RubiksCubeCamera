@@ -1,7 +1,6 @@
 package hu.szte.rubikscubecamera.ui.camera;
 
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImage;
-import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImageForTesting;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,14 +20,10 @@ import android.widget.ImageView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
-import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import org.opencv.android.OpenCVLoader;
@@ -39,16 +34,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import hu.szte.rubikscubecamera.MainViewModel;
 import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCameraBinding;
-import hu.szte.rubikscubecamera.ui.cube.CubeFragment;
-import hu.szte.rubikscubecamera.utils.ImageDecoder;
 
 public class CameraFragment extends Fragment {
     private FragmentCameraBinding binding;
@@ -57,11 +48,12 @@ public class CameraFragment extends Fragment {
     private ActivityResultLauncher<Intent> browseActivityResultLauncher;
     private ConstraintLayout cameraFragmentContainer;
     private NavController navController;
+    private MainViewModel viewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         OpenCVLoader.initDebug();
 
-        MainViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding = FragmentCameraBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
@@ -101,6 +93,7 @@ public class CameraFragment extends Fragment {
         buttonGenerate.setOnClickListener(button -> imageDecoder(image1, image2));
 
         deleteImages();
+
         return root;
     }
 
@@ -117,14 +110,14 @@ public class CameraFragment extends Fragment {
         File[] files = cacheDir.listFiles();
         File largest = null;
         File secondLargest = null;
-        if(cacheDir.exists() && files != null && files.length > 2) {
+        if (cacheDir.exists() && files != null && files.length > 2) {
             largest = files[0];
             secondLargest = files[1];
             if (files[0].lastModified() < files[1].lastModified()) {
                 largest = files[0];
                 secondLargest = files[1];
             }
-            for(int i = 2; i < files.length; i++) {
+            for (int i = 2; i < files.length; i++) {
                 if (files[i].lastModified() > largest.lastModified()) {
                     secondLargest = largest;
                     largest = files[i];
@@ -134,7 +127,7 @@ public class CameraFragment extends Fragment {
                 }
             }
         }
-        if(largest == null || secondLargest == null) {
+        if (largest == null || secondLargest == null) {
             return new ArrayList<>();
         }
         bitmap1 = BitmapFactory.decodeFile(largest.getAbsolutePath());
@@ -146,27 +139,17 @@ public class CameraFragment extends Fragment {
     }
 
     private void imageDecoder(ImageView imageView1, ImageView imageView2) {
-        Callable<String> task = () -> {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
             String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
             cubeString = solveImage(convertImageViewToMat(imageView1)) + solveImage(convertImageViewToMat(imageView2));
             System.out.println("1234: " + cubeString);
 
-            Bundle args = new Bundle();
-            args.putString("cubeString", cubeString);
-            return cubeString;
-        };
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<String> future = executorService.submit(task);
-        try {
-            String cubeString = future.get();
             Bundle bundle = new Bundle();
             bundle.putString("cubeString", cubeString);
-            navController.navigate(R.id.action_navigation_camera_to_navigation_cube, bundle);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        executorService.shutdown();
+            cameraFragmentContainer.post(() ->
+                    navController.navigate(R.id.action_navigation_camera_to_navigation_cube, bundle));
+        });
     }
 
     private Mat convertImageViewToMat(ImageView imageView) {
@@ -197,7 +180,7 @@ public class CameraFragment extends Fragment {
         List<Bitmap> imageBitmaps = getLastTwoBitmaps();
         deleteImages();
         //Bitmap.createScaledBitmap(imageBitmaps.get(0), 960, 1080, false);
-        if(imageBitmaps.size() == 2) {
+        if (imageBitmaps.size() == 2) {
             setImage(imageBitmaps.get(0));
             setImage(imageBitmaps.get(1));
         }
@@ -208,9 +191,12 @@ public class CameraFragment extends Fragment {
     }
 
     private void browseImage() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        browseActivityResultLauncher.launch(intent);
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            browseActivityResultLauncher.launch(intent);
+        });
     }
 
     private void deleteImages() {

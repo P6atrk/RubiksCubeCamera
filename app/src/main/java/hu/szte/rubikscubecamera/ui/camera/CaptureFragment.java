@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -143,7 +144,7 @@ public class CaptureFragment extends Fragment {
 
     void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
         Preview preview = new Preview.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                .setTargetResolution(new Size(720, 960))
                 .build();
 
         CameraSelector cameraSelector = new CameraSelector.Builder()
@@ -154,7 +155,7 @@ public class CaptureFragment extends Fragment {
                 .build();
 
         ImageCapture imageCapture = new ImageCapture.Builder()
-                .setTargetAspectRatio(AspectRatio.RATIO_4_3)
+                .setTargetResolution(new Size(720, 960))
                 .build();
 
         preview.setSurfaceProvider(previewView.getSurfaceProvider());

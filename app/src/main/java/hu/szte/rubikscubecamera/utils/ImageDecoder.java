@@ -16,6 +16,8 @@ import static org.opencv.imgproc.Imgproc.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ImageDecoder {
 
@@ -35,44 +37,25 @@ public class ImageDecoder {
 
         return getMatSquareColors(matSquares);
     }
-
-    public static String solveImageForTesting(Mat mat) {
-        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
-        Mat cubeMask = createCubeMask(mat);
-
-        List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
-
-        findContours(cubeMask, contours, hierarchy, RETR_LIST, CHAIN_APPROX_SIMPLE);
-        cvtColor(cubeMask, cubeMask, COLOR_GRAY2BGR);
-        drawContours(cubeMask, contours, -1, new Scalar(0, 0, 255), 2);
-
-        //drawNumbersOnCubeSquares(cubeMask, contours, hierarchy);
-
-        List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
-        List<Mat> matSquares = createMatSquares(mat, squareMasks);
-
-        return getMatSquareColors(matSquares);
-    }
-
+    
     private static String getMatSquareColors(List<Mat> matSquares) {
         SquareInfo squareInfo = SquareInfo.createSquareInfo();
         StringBuilder colorString = new StringBuilder();
 
         List<List<Mat>> dstss = new ArrayList<>();
-        for(int i = 0; i < matSquares.size(); i++) {
+        for (int i = 0; i < matSquares.size(); i++) {
             cvtColor(matSquares.get(i), matSquares.get(i), Imgproc.COLOR_BGR2HSV);
             dstss.add(new ArrayList<>());
-            for(int j = 0; j < squareInfo.lowerBounds.size(); j++) {
+            for (int j = 0; j < squareInfo.lowerBounds.size(); j++) {
                 Mat dst = Mat.zeros(matSquares.get(i).rows(), matSquares.get(i).cols(), CvType.CV_8U);
                 Core.inRange(matSquares.get(i), squareInfo.lowerBounds.get(j), squareInfo.upperBounds.get(j), dst);
                 dstss.get(i).add(dst);
             }
         }
-        for(List<Mat> dsts : dstss) {
+        for (List<Mat> dsts : dstss) {
             int biggest = 0;
             for (int i = 1; i < dsts.size(); i++) {
-                if(Core.countNonZero(dsts.get(i)) > Core.countNonZero(dsts.get(i - 1))) {
+                if (Core.countNonZero(dsts.get(i)) > Core.countNonZero(dsts.get(i - 1))) {
                     biggest = i;
                 }
             }
@@ -83,17 +66,16 @@ public class ImageDecoder {
 
     private static String rearrangeColorString(String colorString) {
         // U1 U2 ... U9 R1 ... R9 F1 ... F9 D1 ... D9 L1 ... L9 B1 ... B9
-        // TODO: eldönteni hogy 1. vagy 2. kép lesz az
-        int[] urfArrangement = new int[] {
+        int[] urfArrangement = new int[]{
                 26, 24, 22, 25, 21, 17, 23, 18, 14,
                 10, 15, 19, 4, 8, 13, 0, 2, 7,
                 20, 16, 11, 12, 9, 5, 6, 3, 1};
-        int[] dlbArrangement = new int[] {
+        int[] dlbArrangement = new int[]{
                 26, 24, 22, 25, 21, 17, 23, 18, 14,
                 1, 3, 6, 5, 9, 12, 11, 16, 20,
                 7, 2, 0, 13, 8, 4, 19, 15, 10};
 
-        if(colorString.charAt(9) == 'F') {
+        if (colorString.charAt(9) == 'F') {
             return appendFor(colorString, urfArrangement);
         } else {
             return appendFor(colorString, dlbArrangement);
@@ -103,7 +85,8 @@ public class ImageDecoder {
     /**
      * Appends a new string with the characters of the ogString. The arrangement dictates with
      * character is going to be picked from the ogString next
-     * @param ogString the Original string, these characters will be picked.
+     *
+     * @param ogString    the Original string, these characters will be picked.
      * @param arrangement an int array, eg.: [3, 5, 0, 2, 8, 6, 7, 4, 1]
      * @return A string
      */
@@ -113,21 +96,6 @@ public class ImageDecoder {
             str.append(ogString.charAt(i));
         }
         return str.toString();
-    }
-
-    private static void drawNumbersOnCubeSquares(Mat cubeMask, List<MatOfPoint> contours, Mat hierarchy) {
-        int fontScale = 1;
-        Scalar fontColor = new Scalar(255, 0, 0);
-        int fontThickness = 5;
-
-        for (int i = 0; i < hierarchy.cols(); i++) {
-            double[] hierarchyData = hierarchy.get(0, i);
-            int nextHierarchy = (int) hierarchyData[0];
-            String text = String.valueOf(nextHierarchy);
-            MatOfPoint nextContour = contours.get(i);
-
-            putText(cubeMask, text, nextContour.toArray()[0], FONT_HERSHEY_COMPLEX, fontScale, fontColor, fontThickness);
-        }
     }
 
     private static List<Mat> createMatSquares(Mat mat, List<Mat> squareMasks) {
@@ -153,6 +121,7 @@ public class ImageDecoder {
 
     /**
      * Creates a mask where the only white parts are the squares on the cube.
+     *
      * @param mat OpenCv mat, mask will be the same height and width as this mat.
      * @return A 1 channel mask with the same dims as mat.
      */
