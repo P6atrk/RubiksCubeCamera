@@ -1,6 +1,9 @@
 package hu.szte.rubikscubecamera.ui.camera;
 
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertImageViewToMat;
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertMatToBitmap;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImage;
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImageForTesting;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -152,22 +155,20 @@ public class CameraFragment extends Fragment {
         });
     }
 
-    private Mat convertImageViewToMat(ImageView imageView) {
-        Mat mat = new Mat();
-        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+/*
+    private void imageDecoder(ImageView imageView1, ImageView imageView2) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            Mat mat1 = solveImageForTesting(convertImageViewToMat(imageView1));
+            Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
 
-        Bitmap bitmap8888 = bitmap.copy(Bitmap.Config.ARGB_8888, true);
-        Utils.bitmapToMat(bitmap8888, mat);
-        return mat;
+            cameraFragmentContainer.post(() -> {
+                imageView1.setImageBitmap(convertMatToBitmap(mat1));
+                imageView2.setImageBitmap(convertMatToBitmap(mat2));
+            });
+        });
     }
-
-
-    private Bitmap convertMatToBitmap(Mat mat) {
-        Bitmap bitmap = Bitmap.createBitmap(mat.cols(), mat.rows(), Bitmap.Config.ARGB_8888); // this creates a MUTABLE bitmap
-        Utils.matToBitmap(mat, bitmap);
-        return bitmap;
-    }
-
+*/
     private void setImage(Bitmap bitmap) {
         if (image1.getDrawable() == null) {
             image1.setImageBitmap(bitmap);

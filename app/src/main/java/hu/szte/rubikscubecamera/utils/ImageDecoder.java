@@ -16,8 +16,6 @@ import static org.opencv.imgproc.Imgproc.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ImageDecoder {
 
@@ -37,14 +35,64 @@ public class ImageDecoder {
 
         return getMatSquareColors(matSquares);
     }
-    
+
+    public static Mat solveImageForTesting(Mat mat) {
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
+        Mat cubeMask = createCubeMask(mat);
+
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+
+        findContours(cubeMask, contours, hierarchy, RETR_LIST, CHAIN_APPROX_SIMPLE);
+        cvtColor(cubeMask, cubeMask, COLOR_GRAY2BGR);
+        drawContours(cubeMask, contours, -1, new Scalar(0, 0, 255), 2);
+
+        List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
+        List<Mat> matSquares = createMatSquares(mat, squareMasks);
+
+        String colorsString = getMatSquareColors(matSquares);
+
+        drawOnCubeSquares(mat, contours, hierarchy, colorsString);
+
+        return mat;
+    }
+
+    private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours, Mat hierarchy, String colorsString) {
+        int fontScale = 1;
+        Scalar fontColor = new Scalar(255, 0, 0);
+        int fontThickness = 5;
+
+        for (int i = 0; i < hierarchy.cols(); i++) {
+            String text = String.valueOf(colorsString.charAt(i));
+            MatOfPoint nextContour = contours.get(i);
+
+            putText(mat, text, nextContour.toArray()[0], FONT_HERSHEY_COMPLEX, fontScale, fontColor, fontThickness);
+        }
+    }
+
+
+    private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours, Mat hierarchy) {
+        int fontScale = 1;
+        Scalar fontColor = new Scalar(255, 0, 0);
+        int fontThickness = 5;
+
+        for (int i = 0; i < hierarchy.cols(); i++) {
+            double[] hierarchyData = hierarchy.get(0, i);
+            int nextHierarchy = (int) hierarchyData[0];
+            String text = String.valueOf(nextHierarchy);
+            MatOfPoint nextContour = contours.get(i);
+
+            putText(mat, text, nextContour.toArray()[0], FONT_HERSHEY_COMPLEX, fontScale, fontColor, fontThickness);
+        }
+    }
+
     private static String getMatSquareColors(List<Mat> matSquares) {
         SquareInfo squareInfo = SquareInfo.createSquareInfo();
         StringBuilder colorString = new StringBuilder();
 
         List<List<Mat>> dstss = new ArrayList<>();
         for (int i = 0; i < matSquares.size(); i++) {
-            cvtColor(matSquares.get(i), matSquares.get(i), Imgproc.COLOR_BGR2HSV);
+            //cvtColor(matSquares.get(i), matSquares.get(i), Imgproc.COLOR_BGR2HSV);
             dstss.add(new ArrayList<>());
             for (int j = 0; j < squareInfo.lowerBounds.size(); j++) {
                 Mat dst = Mat.zeros(matSquares.get(i).rows(), matSquares.get(i).cols(), CvType.CV_8U);
