@@ -18,25 +18,27 @@ public class SquareInfo {
 
     public static final char[] SIDE_COLORS = new char[] {'U', 'R', 'F', 'D', 'L', 'B', 'E'};
 
-    public List<Scalar> lowerBounds;
-    public List<Scalar> upperBounds;
+    public Scalar[] lowerBounds;
+    public Scalar[] upperBounds;
 
     private SquareInfo() {
-        lowerBounds = new ArrayList<>();
-        lowerBounds.add(new Scalar(180, 180, 180));   // White
-        lowerBounds.add(new Scalar(0, 0, 50));       // Blue
-        lowerBounds.add(new Scalar(0, 0, 150));      // Red
-        lowerBounds.add(new Scalar(150, 150, 0));    // Yellow
-        lowerBounds.add(new Scalar(0, 100, 0));      // Green
-        lowerBounds.add(new Scalar(150, 50, 0));     // Orange
-
-        upperBounds = new ArrayList<>();
-        upperBounds.add(new Scalar(255, 255, 255));  // White
-        upperBounds.add(new Scalar(80, 80, 200));    // Blue
-        upperBounds.add(new Scalar(80, 80, 255));    // Red
-        upperBounds.add(new Scalar(255, 255, 80));  // Yellow
-        upperBounds.add(new Scalar(50, 255, 50));   // Green
-        upperBounds.add(new Scalar(255, 120, 60));  // Orange
+        int colorLower = 100;
+        lowerBounds = new Scalar[] {
+                new Scalar(0, 0, 128),      // White
+                new Scalar(0, colorLower, colorLower),   // Blue OK
+                new Scalar(120, colorLower, colorLower),    // Red OK
+                new Scalar(40, 40, colorLower),   // Yellow OK
+                new Scalar(20, colorLower, colorLower),   // Green OK
+                new Scalar(100, colorLower, colorLower)    // Orange OK
+        };
+        upperBounds = new Scalar[] {
+                new Scalar(180, 90, 255),  // White
+                new Scalar(20, 255, 255),  // Blue
+                new Scalar(140, 255, 255),   // Red
+                new Scalar(100, 255, 255),   // Yellow
+                new Scalar(40, 255, 255),   // Green
+                new Scalar(120, 255, 255)    // Orange
+        };
     }
 
     public static SquareInfo createSquareInfo() {
