@@ -9,17 +9,25 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import static org.opencv.imgproc.Imgproc.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class ImageDecoder {
 
-    public static String solveImage(Mat mat) {
+    public static String solveImage(Mat mat, boolean isURF) {
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
         Mat cubeMask = createCubeMask(mat);
 
@@ -30,39 +38,83 @@ public class ImageDecoder {
         cvtColor(cubeMask, cubeMask, COLOR_GRAY2BGR);
         drawContours(cubeMask, contours, -1, new Scalar(0, 0, 255), 2);
 
-        List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
+        contours = rearrangeContours(contours);
+
+        List<Mat> squareMasks = createSquareMasks(cubeMask, contours);
         List<Mat> matSquares = createMatSquares(mat, squareMasks);
 
-        return getMatSquareColors(matSquares);
+        return getMatSquareColors(matSquares, isURF);
     }
-
+/*
     public static Mat solveImageForTesting(Mat mat) {
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
         Mat cubeMask = createCubeMask(mat);
 
         List<MatOfPoint> contours = new ArrayList<>();
-        Mat hierarchy = new Mat();
 
-        findContours(cubeMask, contours, hierarchy, RETR_LIST, CHAIN_APPROX_SIMPLE);
+        findContours(cubeMask, contours, new Mat(), RETR_LIST, CHAIN_APPROX_SIMPLE);
         cvtColor(cubeMask, cubeMask, COLOR_GRAY2BGR);
-        drawContours(cubeMask, contours, -1, new Scalar(0, 0, 255), 2);
 
-        List<Mat> squareMasks = createSquareMasks(cubeMask, contours, hierarchy);
-        List<Mat> matSquares = createMatSquares(mat, squareMasks);
+        contours = rearrangeContours(contours);
+        //drawOnCubeSquares(cubeMask, contours);
 
-        String colorsString = getMatSquareColors(matSquares);
+        //List<Mat> squareMasks = createSquareMasks(cubeMask, contours);
+        //List<Mat> matSquares = createMatSquares(mat, squareMasks);
+//
+        //String colorsString = getMatSquareColors(matSquares);
+//
+        ////drawOnCubeSquares(mat, contours, hierarchy, colorsString);
+        //drawOnCubeSquares(mat, contours, hierarchy);
+//
+        return cubeMask;
+        //return getMatSquareColors(matSquares);
+    }
+*/
+    private static List<MatOfPoint> rearrangeContours(List<MatOfPoint> contours) {
+        LinkedHashMap<Integer, Point> points = new LinkedHashMap<>();
+        LinkedHashMap<Integer, Point> pointsSorted = new LinkedHashMap<>();
+        List<MatOfPoint> correctContours = new ArrayList<>();
 
-        drawOnCubeSquares(mat, contours, hierarchy, colorsString);
-
-        return mat;
+        for (int i = 0; i < contours.size(); i++) {
+            points.put(i, contours.get(i).toArray()[0]);
+        }
+        for (int i = 0; i < points.size() - 1; i++) {
+            for (int j = i + 1; j < points.size(); j++) {
+                if(Math.abs(points.get(i).y - points.get(j).y) < 6) {
+                    points.get(j).y = points.get(i).y;
+                }
+            }
+        }
+        for (int j = 0; j < points.size(); j++) {
+            int smallest = 0;
+            for (int i = 0; i < points.size(); i++) {
+                if(points.get(i) == null) {
+                    continue;
+                }
+                if(points.get(i).y < points.get(smallest).y) {
+                    smallest = i;
+                } else if (points.get(i).y == points.get(smallest).y) {
+                    if(points.get(i).x < points.get(smallest).x) {
+                        smallest = i;
+                    }
+                }
+            }
+            pointsSorted.put(smallest, points.get(smallest));
+            points.replace(smallest, null);
+        }
+        List<Integer> correctPlacements = new ArrayList<>(pointsSorted.keySet());
+        for (Integer i : correctPlacements) {
+            correctContours.add(contours.get(i));
+        }
+        return correctContours;
     }
 
-    private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours, Mat hierarchy, String colorsString) {
+    private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours, String colorsString) {
         int fontScale = 1;
         Scalar fontColor = new Scalar(255, 0, 0);
         int fontThickness = 5;
 
-        for (int i = 0; i < hierarchy.cols(); i++) {
+        for (int i = 0; i < contours.size(); i++) {
             String text = String.valueOf(colorsString.charAt(i));
             MatOfPoint nextContour = contours.get(i);
 
@@ -70,60 +122,58 @@ public class ImageDecoder {
         }
     }
 
-
-    private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours, Mat hierarchy) {
+    private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours) {
         int fontScale = 1;
         Scalar fontColor = new Scalar(255, 0, 0);
         int fontThickness = 5;
 
-        for (int i = 0; i < hierarchy.cols(); i++) {
-            double[] hierarchyData = hierarchy.get(0, i);
-            int nextHierarchy = (int) hierarchyData[0];
-            String text = String.valueOf(nextHierarchy);
+        for (int i = 0; i < contours.size(); i++) {
+            String text = String.valueOf(i);
             MatOfPoint nextContour = contours.get(i);
 
             putText(mat, text, nextContour.toArray()[0], FONT_HERSHEY_COMPLEX, fontScale, fontColor, fontThickness);
         }
     }
 
-    private static String getMatSquareColors(List<Mat> matSquares) {
+    private static String getMatSquareColors(List<Mat> matSquares, boolean isURF) {
         SquareInfo squareInfo = SquareInfo.createSquareInfo();
         StringBuilder colorString = new StringBuilder();
 
-        List<List<Mat>> dstss = new ArrayList<>();
+        List<List<Mat>> matSquareColorCounters = new ArrayList<>();
         for (int i = 0; i < matSquares.size(); i++) {
-            //cvtColor(matSquares.get(i), matSquares.get(i), Imgproc.COLOR_BGR2HSV);
-            dstss.add(new ArrayList<>());
-            for (int j = 0; j < squareInfo.lowerBounds.size(); j++) {
-                Mat dst = Mat.zeros(matSquares.get(i).rows(), matSquares.get(i).cols(), CvType.CV_8U);
-                Core.inRange(matSquares.get(i), squareInfo.lowerBounds.get(j), squareInfo.upperBounds.get(j), dst);
-                dstss.get(i).add(dst);
+            cvtColor(matSquares.get(i), matSquares.get(i), Imgproc.COLOR_BGR2HSV);
+            matSquareColorCounters.add(new ArrayList<>());
+            for (int j = 0; j < squareInfo.lowerBounds.length; j++) {
+                Mat colorCounter = Mat.zeros(matSquares.get(i).rows(), matSquares.get(i).cols(), CvType.CV_8U);
+                Core.inRange(matSquares.get(i), squareInfo.lowerBounds[j], squareInfo.upperBounds[j], colorCounter);
+                matSquareColorCounters.get(i).add(colorCounter);
             }
         }
-        for (List<Mat> dsts : dstss) {
+        for (List<Mat> colorCounters : matSquareColorCounters) {
             int biggest = 0;
-            for (int i = 1; i < dsts.size(); i++) {
-                if (Core.countNonZero(dsts.get(i)) > Core.countNonZero(dsts.get(i - 1))) {
+            for (int i = 1; i < colorCounters.size(); i++) {
+                if (Core.countNonZero(colorCounters.get(i)) > Core.countNonZero(colorCounters.get(i - 1))) {
                     biggest = i;
                 }
             }
             colorString.append(SquareInfo.SIDE_COLORS[biggest]);
         }
-        return rearrangeColorString(colorString.toString());
+        return rearrangeColorString(colorString.toString(), isURF);
     }
 
-    private static String rearrangeColorString(String colorString) {
+    private static String rearrangeColorString(String colorString, boolean isURF) {
         // U1 U2 ... U9 R1 ... R9 F1 ... F9 D1 ... D9 L1 ... L9 B1 ... B9
+        int UCenter = 5, RCenter = 17, FCenter = 18;
         int[] urfArrangement = new int[]{
-                26, 24, 22, 25, 21, 17, 23, 18, 14,
-                10, 15, 19, 4, 8, 13, 0, 2, 7,
-                20, 16, 11, 12, 9, 5, 6, 3, 1};
+                0, 2, 4, 1, 5, 9, 3, 8, 12,
+                16, 11, 7, 22, 18, 14, 26, 24, 20,
+                6, 10, 15, 13, 17, 21, 19, 23, 25};
         int[] dlbArrangement = new int[]{
-                26, 24, 22, 25, 21, 17, 23, 18, 14,
-                1, 3, 6, 5, 9, 12, 11, 16, 20,
-                7, 2, 0, 13, 8, 4, 19, 15, 10};
+                0, 2, 4, 1, 5, 9, 3, 8, 12,
+                25, 23, 19, 21, 17, 13, 15, 10, 6,
+                20, 24, 26, 14, 18, 22, 7, 11, 16};
 
-        if (colorString.charAt(9) == 'F') {
+        if (isURF) {
             return appendFor(colorString, urfArrangement);
         } else {
             return appendFor(colorString, dlbArrangement);
@@ -154,11 +204,11 @@ public class ImageDecoder {
         return matSquares;
     }
 
-    private static List<Mat> createSquareMasks(Mat cubeMask, List<MatOfPoint> contours, Mat hierarchy) {
+    private static List<Mat> createSquareMasks(Mat cubeMask, List<MatOfPoint> contours) {
         Scalar color = new Scalar(255, 255, 255);
         List<Mat> squareMasks = new ArrayList<>();
 
-        for (int i = 0; i < hierarchy.cols(); i++) {
+        for (int i = 0; i < contours.size(); i++) {
             Mat nextSquareMask = Mat.zeros(cubeMask.rows(), cubeMask.cols(), CvType.CV_8U);
             drawContours(nextSquareMask, contours, i, color, FILLED);
             squareMasks.add(nextSquareMask);

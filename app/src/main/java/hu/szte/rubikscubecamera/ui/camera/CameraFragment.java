@@ -3,7 +3,6 @@ package hu.szte.rubikscubecamera.ui.camera;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertImageViewToMat;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertMatToBitmap;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImage;
-import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImageForTesting;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -145,7 +144,8 @@ public class CameraFragment extends Fragment {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
-            cubeString = solveImage(convertImageViewToMat(imageView1)) + solveImage(convertImageViewToMat(imageView2));
+            cubeString = solveImage(convertImageViewToMat(imageView2), true)
+                    + solveImage(convertImageViewToMat(imageView1), false);
             System.out.println("1234: " + cubeString);
 
             Bundle bundle = new Bundle();
