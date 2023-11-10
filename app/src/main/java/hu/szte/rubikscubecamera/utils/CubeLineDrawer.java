@@ -160,6 +160,7 @@ public class CubeLineDrawer {
      */
     private static void calculateLines(double w, double h) {
         double half = 1.0 / 2.0;
+        double notHalf = 1.0 / 2.0 * 0.7;
 
         M = new Point(w / 2, h / 2);
         D = new Point(M.x, M.y + w / MD_LENGTH_FRACTION);
@@ -170,9 +171,9 @@ public class CubeLineDrawer {
         Point OLD = reflectPointAboutLine(M, LU, D);
         Point ORD = reflectPointAboutLine(M, RU, D);
 
-        U = f(OU, f(M, OU, half), half);
-        LD = f(OLD, f(M, OLD, half), half);
-        RD = f(ORD, f(M, ORD, half), half);
+        U = f(OU, f(M, OU, half), notHalf);
+        LD = f(OLD, f(M, OLD, half), notHalf);
+        RD = f(ORD, f(M, ORD, half), notHalf);
     }
 
     /**
