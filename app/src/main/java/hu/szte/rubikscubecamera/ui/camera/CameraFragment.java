@@ -3,12 +3,12 @@ package hu.szte.rubikscubecamera.ui.camera;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertImageViewToMat;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertMatToBitmap;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImage;
+import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImageForDebugging;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -29,7 +29,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
 import java.io.File;
@@ -44,6 +43,8 @@ import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCameraBinding;
 
 public class CameraFragment extends Fragment {
+    private final boolean DEBUGGING = true;
+
     private FragmentCameraBinding binding;
     private ImageView image1;
     private ImageView image2;
@@ -92,7 +93,11 @@ public class CameraFragment extends Fragment {
         buttonCamera.setOnClickListener(image -> takeImage());
         buttonBrowse.setOnClickListener(image -> browseImage());
         buttonDelete.setOnClickListener(image -> deleteImages());
-        buttonGenerate.setOnClickListener(button -> imageDecoder(image1, image2));
+        if(DEBUGGING) {
+            buttonGenerate.setOnClickListener(button -> imageDecoderForDebugging(image1, image2));
+        } else {
+            buttonGenerate.setOnClickListener(button -> imageDecoder(image1, image2));
+        }
 
         deleteImages();
 
@@ -155,12 +160,12 @@ public class CameraFragment extends Fragment {
         });
     }
 
-/*
-    private void imageDecoder(ImageView imageView1, ImageView imageView2) {
+
+    private void imageDecoderForDebugging(ImageView imageView1, ImageView imageView2) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
-            Mat mat1 = solveImageForTesting(convertImageViewToMat(imageView1));
-            Mat mat2 = solveImageForTesting(convertImageViewToMat(imageView2));
+            Mat mat1 = solveImageForDebugging(convertImageViewToMat(imageView1), false);
+            Mat mat2 = solveImageForDebugging(convertImageViewToMat(imageView2), true);
 
             cameraFragmentContainer.post(() -> {
                 imageView1.setImageBitmap(convertMatToBitmap(mat1));
@@ -168,7 +173,7 @@ public class CameraFragment extends Fragment {
             });
         });
     }
-*/
+
     private void setImage(Bitmap bitmap) {
         if (image1.getDrawable() == null) {
             image1.setImageBitmap(bitmap);

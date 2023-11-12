@@ -11,19 +11,13 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import static org.opencv.imgproc.Imgproc.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 public class ImageDecoder {
 
@@ -43,10 +37,10 @@ public class ImageDecoder {
         List<Mat> squareMasks = createSquareMasks(cubeMask, contours);
         List<Mat> matSquares = createMatSquares(mat, squareMasks);
 
-        return getMatSquareColors(matSquares, isURF);
+        return rearrangeColorString(getMatSquareColors(matSquares), isURF);
     }
-/*
-    public static Mat solveImageForTesting(Mat mat) {
+
+    public static Mat solveImageForDebugging(Mat mat, boolean isURF) {
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
         Mat cubeMask = createCubeMask(mat);
 
@@ -56,57 +50,19 @@ public class ImageDecoder {
         cvtColor(cubeMask, cubeMask, COLOR_GRAY2BGR);
 
         contours = rearrangeContours(contours);
-        //drawOnCubeSquares(cubeMask, contours);
+        drawOnCubeSquares(cubeMask, contours);
 
-        //List<Mat> squareMasks = createSquareMasks(cubeMask, contours);
-        //List<Mat> matSquares = createMatSquares(mat, squareMasks);
-//
+        List<Mat> squareMasks = createSquareMasks(cubeMask, contours);
+        List<Mat> matSquares = createMatSquares(mat, squareMasks);
+
         //String colorsString = getMatSquareColors(matSquares);
-//
-        ////drawOnCubeSquares(mat, contours, hierarchy, colorsString);
-        //drawOnCubeSquares(mat, contours, hierarchy);
-//
-        return cubeMask;
-        //return getMatSquareColors(matSquares);
-    }
-*/
-    private static List<MatOfPoint> rearrangeContours(List<MatOfPoint> contours) {
-        LinkedHashMap<Integer, Point> points = new LinkedHashMap<>();
-        LinkedHashMap<Integer, Point> pointsSorted = new LinkedHashMap<>();
-        List<MatOfPoint> correctContours = new ArrayList<>();
 
-        for (int i = 0; i < contours.size(); i++) {
-            points.put(i, contours.get(i).toArray()[0]);
-        }
-        for (int i = 0; i < points.size() - 1; i++) {
-            for (int j = i + 1; j < points.size(); j++) {
-                if(Math.abs(points.get(i).y - points.get(j).y) < 6) {
-                    points.get(j).y = points.get(i).y;
-                }
-            }
-        }
-        for (int j = 0; j < points.size(); j++) {
-            int smallest = 0;
-            for (int i = 0; i < points.size(); i++) {
-                if(points.get(i) == null) {
-                    continue;
-                }
-                if(points.get(i).y < points.get(smallest).y) {
-                    smallest = i;
-                } else if (points.get(i).y == points.get(smallest).y) {
-                    if(points.get(i).x < points.get(smallest).x) {
-                        smallest = i;
-                    }
-                }
-            }
-            pointsSorted.put(smallest, points.get(smallest));
-            points.replace(smallest, null);
-        }
-        List<Integer> correctPlacements = new ArrayList<>(pointsSorted.keySet());
-        for (Integer i : correctPlacements) {
-            correctContours.add(contours.get(i));
-        }
-        return correctContours;
+        //drawOnCubeSquares(mat, contours, hierarchy, colorsString);
+        //drawOnCubeSquares(mat, contours, hierarchy);
+
+        //return cubeMask;
+        //String colorString = rearrangeColorString(getMatSquareColors(matSquares), isURF);
+        return getMatSquareColors(matSquares, SquareInfo.Color.WHITE.ordinal());
     }
 
     private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours, String colorsString) {
@@ -135,7 +91,61 @@ public class ImageDecoder {
         }
     }
 
-    private static String getMatSquareColors(List<Mat> matSquares, boolean isURF) {
+    /**
+     * Rearranges the contours based on their corrected position.
+     * Up->Down and Left->Right.
+     *
+     * @param contours List of cubeMask square contours.
+     * @return A list of contours in the correct order.
+     */
+    private static List<MatOfPoint> rearrangeContours(List<MatOfPoint> contours) {
+        LinkedHashMap<Integer, Point> points = new LinkedHashMap<>();
+        LinkedHashMap<Integer, Point> pointsSorted = new LinkedHashMap<>();
+        List<MatOfPoint> correctContours = new ArrayList<>();
+
+        for (int i = 0; i < contours.size(); i++) {
+            points.put(i, contours.get(i).toArray()[0]);
+        }
+        for (int i = 0; i < points.size() - 1; i++) {
+            for (int j = i + 1; j < points.size(); j++) {
+                if (Math.abs(points.get(i).y - points.get(j).y) < 6) {
+                    points.get(j).y = points.get(i).y;
+                }
+            }
+        }
+        for (int j = 0; j < points.size(); j++) {
+            int smallest = 0;
+            for (int i = 0; i < points.size(); i++) {
+                if (points.get(i) == null) {
+                    continue;
+                }
+                if (points.get(i).y < points.get(smallest).y) {
+                    smallest = i;
+                } else if (points.get(i).y == points.get(smallest).y) {
+                    if (points.get(i).x < points.get(smallest).x) {
+                        smallest = i;
+                    }
+                }
+            }
+            pointsSorted.put(smallest, points.get(smallest));
+            points.replace(smallest, null);
+        }
+        List<Integer> correctPlacements = new ArrayList<>(pointsSorted.keySet());
+        for (Integer i : correctPlacements) {
+            correctContours.add(contours.get(i));
+        }
+        return correctContours;
+    }
+
+    /**
+     * As an input gets a list of cube squares cutouts.
+     * Decides which color is the cube square and stores it in a string.
+     * Outputs the colors of the squares as a string.
+     *
+     * @param matSquares List of cube square cutouts.
+     * @return A list of chars in a string. Each char represent a square of the cube.
+     */
+    private static String getMatSquareColors(List<Mat> matSquares) {
         SquareInfo squareInfo = SquareInfo.createSquareInfo();
         StringBuilder colorString = new StringBuilder();
 
@@ -152,26 +162,53 @@ public class ImageDecoder {
         for (List<Mat> colorCounters : matSquareColorCounters) {
             int biggest = 0;
             for (int i = 1; i < colorCounters.size(); i++) {
-                if (Core.countNonZero(colorCounters.get(i)) > Core.countNonZero(colorCounters.get(i - 1))) {
+                if (Core.countNonZero(colorCounters.get(i)) > Core.countNonZero(colorCounters.get(biggest))) {
                     biggest = i;
                 }
             }
             colorString.append(SquareInfo.SIDE_COLORS[biggest]);
         }
-        return rearrangeColorString(colorString.toString(), isURF);
+        return colorString.toString();
     }
 
+    private static Mat getMatSquareColors(List<Mat> matSquares, int color) {
+        SquareInfo squareInfo = SquareInfo.createSquareInfo();
+
+        Mat matCube = Mat.zeros(matSquares.get(0).rows(), matSquares.get(0).cols(), CvType.CV_8UC3);
+        for (Mat matSquare : matSquares) {
+            Core.bitwise_or(matCube, matSquare, matCube);
+        }
+
+        List<Mat> matCubeColorMasks = new ArrayList<>();
+        cvtColor(matCube, matCube, Imgproc.COLOR_BGR2HSV);
+        for (int j = 0; j < squareInfo.lowerBounds.length; j++) {
+            Mat cubeColorMask = Mat.zeros(matCube.rows(), matCube.cols(), CvType.CV_8U);
+            Core.inRange(matCube, squareInfo.lowerBounds[j], squareInfo.upperBounds[j], cubeColorMask);
+            matCubeColorMasks.add(cubeColorMask);
+        }
+
+        return matCubeColorMasks.get(SquareInfo.Color.values()[color].ordinal());
+    }
+
+    /**
+     * Return a string made out of the chars from the input string.
+     * The whole string is rearranges based on the int[] vars.
+     * This input string is the half of the cube string representation.
+     *
+     * @param colorString String to be rearranged.
+     * @param isURF       Decides if the string represents the urf or the dlb side of the cube.
+     * @return a rearranged string made out of the input string.
+     */
     private static String rearrangeColorString(String colorString, boolean isURF) {
         // U1 U2 ... U9 R1 ... R9 F1 ... F9 D1 ... D9 L1 ... L9 B1 ... B9
-        int UCenter = 5, RCenter = 17, FCenter = 18;
         int[] urfArrangement = new int[]{
-                0, 2, 4, 1, 5, 9, 3, 8, 12,
-                16, 11, 7, 22, 18, 14, 26, 24, 20,
+                0, 2, 4, 1, 5, 9, 3, 8, 11,
+                16, 12, 7, 22, 18, 14, 26, 24, 20,
                 6, 10, 15, 13, 17, 21, 19, 23, 25};
         int[] dlbArrangement = new int[]{
-                0, 2, 4, 1, 5, 9, 3, 8, 12,
+                3, 1, 0, 8, 5, 2, 11, 9, 4,
                 25, 23, 19, 21, 17, 13, 15, 10, 6,
-                20, 24, 26, 14, 18, 22, 7, 11, 16};
+                20, 24, 26, 14, 18, 22, 7, 12, 16};
 
         if (isURF) {
             return appendFor(colorString, urfArrangement);
@@ -196,6 +233,15 @@ public class ImageDecoder {
         return str.toString();
     }
 
+    /**
+     * Returns a list of Mat made out of the cube squares.
+     * These mats are the actual image cutouts of the cube.
+     * There are 27 mats in the list.
+     *
+     * @param mat         The original image of the cube.
+     * @param squareMasks A list of cube square masks. One for each square.
+     * @return A Mat List of square cutouts of the original cube image. 27 in length.
+     */
     private static List<Mat> createMatSquares(Mat mat, List<Mat> squareMasks) {
         List<Mat> matSquares = new ArrayList<>();
         for (Mat squareMask : squareMasks) {
@@ -204,6 +250,14 @@ public class ImageDecoder {
         return matSquares;
     }
 
+    /**
+     * Creates a list of masks from the cubeMask. A single mask is
+     * a single cube square mask. There are 27 of them, one for each square on the image.
+     *
+     * @param cubeMask The Mat mask for the whole cube.
+     * @param contours Contours of the cubeMask.
+     * @return A list of Mat masks. 27 in length. One for each cube square.
+     */
     private static List<Mat> createSquareMasks(Mat cubeMask, List<MatOfPoint> contours) {
         Scalar color = new Scalar(255, 255, 255);
         List<Mat> squareMasks = new ArrayList<>();
@@ -218,7 +272,7 @@ public class ImageDecoder {
     }
 
     /**
-     * Creates a mask where the only white parts are the squares on the cube.
+     * Creates a mask where the only white parts are the squares of the cube.
      *
      * @param mat OpenCv mat, mask will be the same height and width as this mat.
      * @return A 1 channel mask with the same dims as mat.
@@ -236,7 +290,7 @@ public class ImageDecoder {
     }
 
     /**
-     * Applies a mask to a mat without changing either the mat or the mask.
+     * Applies a mask to a mat and return it without changing either the mat or the mask.
      *
      * @param mat  The image which the mask will be applied to.
      * @param mask This mask is applied to the mat.
@@ -268,7 +322,7 @@ public class ImageDecoder {
     }
 
     /**
-     * Convert a mat to a bitmap exactly.
+     * Convert a mat to a bitmap.
      *
      * @param mat OpenCV Mat to be converted
      * @return A Bitmap that is the same height and width as the mat, just a different data type.
