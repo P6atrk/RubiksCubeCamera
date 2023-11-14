@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -145,6 +146,13 @@ public class CameraFragment extends Fragment {
     }
 
     private void imageDecoder(ImageView imageView1, ImageView imageView2) {
+        if(imageView1.getDrawable() == null || imageView1.getDrawable() == null) {
+            Toast.makeText(
+                    requireActivity(),
+                    "There are no images to decode.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";

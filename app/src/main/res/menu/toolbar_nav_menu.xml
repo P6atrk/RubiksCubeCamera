@@ -3,13 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_options"
-        android:icon="@drawable/baseline_settings_24"
-        android:title="@string/title_options"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/navigation_guide"
         android:icon="@drawable/baseline_info_24"
         android:title="@string/title_guide"
-        app:showAsAction="never" />
+        app:showAsAction="always" />
 </menu>

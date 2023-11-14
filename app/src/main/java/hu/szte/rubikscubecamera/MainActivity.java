@@ -1,9 +1,12 @@
 package hu.szte.rubikscubecamera;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -14,23 +17,32 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import java.util.Objects;
+
 import hu.szte.rubikscubecamera.databinding.ActivityMainBinding;
 import hu.szte.rubikscubecamera.ui.guide.GuideActivity;
-import hu.szte.rubikscubecamera.ui.options.OptionsActivity;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    private static final String FIRST_TIME_KEY = "isFirstTime";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        // Check if it's the first time the app is opened
+        SharedPreferences preferences = getSharedPreferences("PrefsFile", MODE_PRIVATE);
+        boolean isFirstTime = preferences.getBoolean(FIRST_TIME_KEY, true);
+
+        hu.szte.rubikscubecamera.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding.getRoot();
         setContentView(binding.getRoot());
 
         Toolbar mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -39,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        if (isFirstTime) {
+            preferences.edit().putBoolean(FIRST_TIME_KEY, false).apply();
+            startActivity(new Intent(MainActivity.this, GuideActivity.class));
+        }
     }
 
     @Override
@@ -49,21 +66,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.navigation_options:
-                Intent optionsIntent = new Intent(MainActivity.this, OptionsActivity.class);
-                startActivity(optionsIntent);
-                return true;
-            case R.id.navigation_guide:
-                Intent guideIntent = new Intent(MainActivity.this, GuideActivity.class);
-                startActivity(guideIntent);
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-
+        if (item.getItemId() == R.id.navigation_guide) {
+            Intent guideIntent = new Intent(MainActivity.this, GuideActivity.class);
+            startActivity(guideIntent);
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 }
