@@ -23,10 +23,6 @@
             android:name=".ui.guide.GuideActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.options.OptionsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_options" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

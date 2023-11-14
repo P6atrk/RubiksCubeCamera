@@ -14,9 +14,10 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import java.util.Objects;
+
 import hu.szte.rubikscubecamera.databinding.ActivityMainBinding;
 import hu.szte.rubikscubecamera.ui.guide.GuideActivity;
-import hu.szte.rubikscubecamera.ui.options.OptionsActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar mainToolbar = findViewById(R.id.main_toolbar);
         setSupportActionBar(mainToolbar);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -49,21 +52,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.navigation_options:
-                Intent optionsIntent = new Intent(MainActivity.this, OptionsActivity.class);
-                startActivity(optionsIntent);
-                return true;
-            case R.id.navigation_guide:
-                Intent guideIntent = new Intent(MainActivity.this, GuideActivity.class);
-                startActivity(guideIntent);
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-
+        if (item.getItemId() == R.id.navigation_guide) {
+            Intent guideIntent = new Intent(MainActivity.this, GuideActivity.class);
+            startActivity(guideIntent);
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 }

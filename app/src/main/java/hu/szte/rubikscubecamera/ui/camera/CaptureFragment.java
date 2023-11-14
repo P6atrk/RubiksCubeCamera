@@ -1,13 +1,9 @@
 package hu.szte.rubikscubecamera.ui.camera;
 
-import static org.opencv.imgproc.Imgproc.line;
-
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,13 +14,14 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.camera.core.AspectRatio;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -40,10 +37,6 @@ import androidx.navigation.Navigation;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-import org.opencv.android.Utils;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -52,6 +45,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCaptureBinding;
 import hu.szte.rubikscubecamera.utils.CubeLineDrawer;
 
@@ -62,7 +56,7 @@ public class CaptureFragment extends Fragment {
     private PreviewView previewView;
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
-    private TextView imageNumber;
+    private MultiAutoCompleteTextView imageText;
     private Button imageCaptureButton;
     private View root;
 
@@ -80,11 +74,16 @@ public class CaptureFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = FragmentCaptureBinding.inflate(getLayoutInflater());
+        binding = FragmentCaptureBinding.inflate(inflater, container, false);
         root = binding.getRoot();
 
+        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(false);
+        }
+
         previewView = binding.previewView;
-        imageNumber = binding.imageNumber;
+        imageText = binding.imageNumber;
         imageCaptureButton = binding.imageCaptureButton;
 
         surfaceView = binding.surfaceView;
@@ -178,7 +177,7 @@ public class CaptureFragment extends Fragment {
                                         Toast.LENGTH_SHORT).show();
                                 if(!secondImage) {
                                     secondImage = true;
-                                    imageNumber.setText("Image 2");
+                                    imageText.setText(R.string.image_text_2);
                                 } else {
                                     stopCamera(cameraProvider);
                                 }
