@@ -3,36 +3,28 @@ package hu.szte.rubikscubecamera.ui.camera;
 import static org.opencv.imgproc.Imgproc.line;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.content.ContentValues;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.MediaStore;
+import android.util.Size;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -44,28 +36,24 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LifecycleOwner;
+import androidx.navigation.Navigation;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCaptureBinding;
-import hu.szte.rubikscubecamera.ui.cube.CubeFragment;
+import hu.szte.rubikscubecamera.utils.CubeLineDrawer;
 
 public class CaptureFragment extends Fragment {
 
@@ -76,6 +64,7 @@ public class CaptureFragment extends Fragment {
     private SurfaceHolder surfaceHolder;
     private TextView imageNumber;
     private Button imageCaptureButton;
+    private View root;
 
     private Executor executor = Executors.newSingleThreadExecutor();
 
@@ -92,7 +81,7 @@ public class CaptureFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentCaptureBinding.inflate(getLayoutInflater());
-        View root = binding.getRoot();
+        root = binding.getRoot();
 
         previewView = binding.previewView;
         imageNumber = binding.imageNumber;
@@ -111,8 +100,8 @@ public class CaptureFragment extends Fragment {
                 Canvas canvas = surfaceHolder.lockCanvas();
 
                 if(canvas == null) return;
-                drawOnCanvas(canvas);
-
+                CubeLineDrawer.drawInnerLines(canvas);
+                CubeLineDrawer.drawOuterLines(canvas);
 
                 surfaceHolder.unlockCanvasAndPost(canvas);
             }
@@ -151,8 +140,8 @@ public class CaptureFragment extends Fragment {
     }
 
     void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
-
         Preview preview = new Preview.Builder()
+                .setTargetResolution(new Size(720, 960))
                 .build();
 
         CameraSelector cameraSelector = new CameraSelector.Builder()
@@ -162,20 +151,20 @@ public class CaptureFragment extends Fragment {
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                 .build();
 
-        ImageCapture.Builder builder = new ImageCapture.Builder();
-
-        final ImageCapture imageCapture = builder
+        ImageCapture imageCapture = new ImageCapture.Builder()
+                .setTargetResolution(new Size(720, 960))
                 .build();
 
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
         Camera camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis, imageCapture);
 
+        camera.getCameraControl().setLinearZoom(0f);
+
         imageCaptureButton.setOnClickListener(a -> {
 
             SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyyMMddHHmmss", Locale.US);
             File file = new File(requireActivity().getCacheDir(), mDateFormat.format(new Date()) + ".jpg");
-            System.out.println("ABCD imagecapture pressed");
 
             ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(file).build();
             imageCapture.takePicture(outputFileOptions, executor, new ImageCapture.OnImageSavedCallback() {
@@ -207,8 +196,7 @@ public class CaptureFragment extends Fragment {
 
     private void stopCamera(@NonNull ProcessCameraProvider cameraProvider) {
         cameraProvider.unbindAll();
-        System.out.println("ABCD unbindAll");
-        requireActivity().getSupportFragmentManager().popBackStack();
+        Navigation.findNavController(root).popBackStack();
     }
 
     private boolean allPermissionsGranted() {
@@ -218,37 +206,6 @@ public class CaptureFragment extends Fragment {
             }
         }
         return true;
-    }
-
-    private void drawOnCanvas(Canvas canvas) {
-        Paint linePaint = new Paint();
-        linePaint.setColor(Color.rgb(255, 0, 0));
-        linePaint.setStrokeWidth(20);
-
-        // w=width, h=height, L=left, R=right, M=middle, U=up, D=down
-        float w = canvas.getWidth();
-        float h = canvas.getHeight();
-        float c = 5f / 7 * w / 2;
-        float d = c * 0.2f;
-
-        float wM = w / 2;
-        float wL = wM - c;
-        float wR = wM + c;
-        float wDL = wM - c + d;
-        float wDR = wM + c - d;
-
-        float hM = h / 2;
-        float hU = hM + c;
-        float hD = hM - c;
-        float hMU = hU + (hM - hU) / 2;
-        float hMD = hD - (hD - hM) / 2.3f;
-
-        canvas.drawLine(wDL, hMU, wM, hU, linePaint);
-        canvas.drawLine(wM, hU, wDR, hMU, linePaint);
-        canvas.drawLine(wDR, hMU, wR, hMD, linePaint);
-        canvas.drawLine(wR, hMD, wM, hD, linePaint);
-        canvas.drawLine(wM, hD, wL, hMD, linePaint);
-        canvas.drawLine(wL, hMD, wDL, hMU, linePaint);
     }
 
     private final ActivityResultLauncher<String[]> requestMultiplePermissionsLauncher = registerForActivityResult(

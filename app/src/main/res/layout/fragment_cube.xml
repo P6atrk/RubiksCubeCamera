@@ -2,9 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cube_fragment_contrainst_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.cube.CubeFragment" >
+    tools:context=".ui.cube.CubeFragment">
 
     <TableLayout
         android:id="@+id/tableLayout"
