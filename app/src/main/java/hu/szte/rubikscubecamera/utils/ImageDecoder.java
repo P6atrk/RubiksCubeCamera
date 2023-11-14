@@ -62,7 +62,7 @@ public class ImageDecoder {
 
         //return cubeMask;
         //String colorString = rearrangeColorString(getMatSquareColors(matSquares), isURF);
-        return getMatSquareColors(matSquares, SquareInfo.Color.WHITE.ordinal());
+        return getMatSquareColors(matSquares, SquareInfo.Color.BLUE.ordinal());
     }
 
     private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours, String colorsString) {
@@ -162,7 +162,8 @@ public class ImageDecoder {
         for (List<Mat> colorCounters : matSquareColorCounters) {
             int biggest = 0;
             for (int i = 1; i < colorCounters.size(); i++) {
-                if (Core.countNonZero(colorCounters.get(i)) > Core.countNonZero(colorCounters.get(biggest))) {
+                int biggestCount =  Core.countNonZero(colorCounters.get(biggest));
+                if (Core.countNonZero(colorCounters.get(i)) > biggestCount) {
                     biggest = i;
                 }
             }

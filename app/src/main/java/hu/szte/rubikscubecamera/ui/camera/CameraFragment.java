@@ -93,7 +93,7 @@ public class CameraFragment extends Fragment {
         buttonCamera.setOnClickListener(image -> takeImage());
         buttonBrowse.setOnClickListener(image -> browseImage());
         buttonDelete.setOnClickListener(image -> deleteImages());
-        if(DEBUGGING) {
+        if(!DEBUGGING) {
             buttonGenerate.setOnClickListener(button -> imageDecoderForDebugging(image1, image2));
         } else {
             buttonGenerate.setOnClickListener(button -> imageDecoder(image1, image2));

@@ -22,25 +22,26 @@ public class SquareInfo {
     public Scalar[] upperBounds;
 
     private SquareInfo() {
-        int colorLower = 100;
         lowerBounds = new Scalar[] {
-                new Scalar(0, 0, 128),      // White
-                new Scalar(0, colorLower, colorLower),   // Blue OK
-                new Scalar(120, colorLower, colorLower),    // Red OK
-                new Scalar(40, 40, colorLower),   // Yellow OK
-                new Scalar(20, colorLower, colorLower),   // Green OK
-                new Scalar(100, colorLower, colorLower)    // Orange OK
+                new Scalar(0, 0, 100),      // White
+                new Scalar(0, 70, 60),   // Blue OK
+                new Scalar(122, 40, 70),    // Red OK
+                new Scalar(70, 30, 70),   // Yellow OK
+                new Scalar(20, 40, 55),   // Green OK
+                new Scalar(100, 100, 100)    // Orange OK
         };
         upperBounds = new Scalar[] {
-                new Scalar(180, 90, 255),  // White
-                new Scalar(20, 255, 255),  // Blue
+                new Scalar(180, 70, 255),  // White
+                new Scalar(19, 255, 255),  // Blue
                 new Scalar(140, 255, 255),   // Red
                 new Scalar(100, 255, 255),   // Yellow
-                new Scalar(40, 255, 255),   // Green
-                new Scalar(120, 255, 255)    // Orange
+                new Scalar(70, 255, 255),   // Green
+                new Scalar(121, 255, 255)    // Orange
         };
     }
-
+    /*
+    fehér->kék
+    */
     public static SquareInfo createSquareInfo() {
         return new SquareInfo();
     }
