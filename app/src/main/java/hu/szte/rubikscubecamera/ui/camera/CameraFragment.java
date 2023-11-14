@@ -26,6 +26,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
 import org.opencv.android.OpenCVLoader;
@@ -50,21 +52,18 @@ public class CameraFragment extends Fragment {
     private ImageView image2;
     private ActivityResultLauncher<Intent> browseActivityResultLauncher;
     private ConstraintLayout cameraFragmentContainer;
-    private NavController navController;
-    private MainViewModel viewModel;
+    private View root;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         OpenCVLoader.initDebug();
 
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        MainViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding = FragmentCameraBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        root = binding.getRoot();
 
         cameraFragmentContainer = binding.cameraFragmentContainer;
         image1 = binding.image1;
         image2 = binding.image2;
-
-        navController = NavHostFragment.findNavController(this);
 
         ImageButton buttonCamera = binding.buttonCamera;
         ImageButton buttonBrowse = binding.buttonBrowse;
@@ -156,7 +155,15 @@ public class CameraFragment extends Fragment {
             Bundle bundle = new Bundle();
             bundle.putString("cubeString", cubeString);
             cameraFragmentContainer.post(() ->
-                    navController.navigate(R.id.action_navigation_camera_to_navigation_cube, bundle));
+                    Navigation.findNavController(root)
+                            .navigate(
+                                    R.id.action_navigation_camera_to_navigation_cube,
+                                    bundle,
+                                    new NavOptions.Builder()
+                                            .setPopUpTo(R.id.navigation_camera, true)
+                                            .build()
+                            )
+            );
         });
     }
 
@@ -193,7 +200,9 @@ public class CameraFragment extends Fragment {
     }
 
     private void takeImage() {
-        navController.navigate(R.id.action_navigation_camera_to_navigation_capture);
+        Navigation.findNavController(root)
+                .navigate(
+                        R.id.action_navigation_camera_to_navigation_capture);
     }
 
     private void browseImage() {

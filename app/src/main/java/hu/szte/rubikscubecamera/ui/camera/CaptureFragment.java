@@ -36,8 +36,7 @@ import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.Navigation;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -65,7 +64,7 @@ public class CaptureFragment extends Fragment {
     private SurfaceHolder surfaceHolder;
     private TextView imageNumber;
     private Button imageCaptureButton;
-    private NavController navController;
+    private View root;
 
     private Executor executor = Executors.newSingleThreadExecutor();
 
@@ -82,13 +81,11 @@ public class CaptureFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = FragmentCaptureBinding.inflate(getLayoutInflater());
-        View root = binding.getRoot();
+        root = binding.getRoot();
 
         previewView = binding.previewView;
         imageNumber = binding.imageNumber;
         imageCaptureButton = binding.imageCaptureButton;
-
-        navController = NavHostFragment.findNavController(this);
 
         surfaceView = binding.surfaceView;
         surfaceHolder = surfaceView.getHolder();
@@ -199,7 +196,7 @@ public class CaptureFragment extends Fragment {
 
     private void stopCamera(@NonNull ProcessCameraProvider cameraProvider) {
         cameraProvider.unbindAll();
-        navController.popBackStack();
+        Navigation.findNavController(root).popBackStack();
     }
 
     private boolean allPermissionsGranted() {

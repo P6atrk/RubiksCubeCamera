@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.NavOptions;
+import androidx.navigation.Navigation;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,24 +31,22 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private final String COLOR_CHANGER_NAME = "colorChanger";
     private String cubeOld = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
     private ConstraintLayout constraintLayout;
+    private View root;
 
     private ImageButton[] squares;
     private ImageButton[] colorChangers;
-    private NavController navController;
 
     private SquareInfo.Color selectedColor = SquareInfo.Color.RED;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding = FragmentCubeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        root = binding.getRoot();
 
         final Button buttonSolveCube = binding.buttonSolveCube;
         final Button buttonReset = binding.buttonReset;
         final Button buttonRandomize = binding.buttonRandomize;
         constraintLayout = binding.cubeFragmentContrainstLayout;
-
-        navController = NavHostFragment.findNavController(this);
 
         viewModel.getCube().observe(getViewLifecycleOwner(), cube -> {
             System.out.println("CUBE CREATE: " + cube);
@@ -98,8 +96,16 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
             if(KociembaImpl.verifyCube(cube)) {
                 constraintLayout.post(() -> {
                     viewModel.setResult(result);
-                    navController.navigate(R.id.action_navigation_cube_to_navigation_solution);
                     System.out.println("CUBE SOLVED: " + result);
+                    Navigation.findNavController(root)
+                            .navigate(
+                                    R.id.action_navigation_cube_to_navigation_solution,
+                                    new Bundle(),
+                                    new NavOptions.Builder().setPopUpTo(
+                                            R.id.navigation_cube,
+                                            true
+                                    ).build()
+                            );
                 });
             } else {
                     System.out.println("CUBE WRONG: " + result);
