@@ -32,11 +32,6 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private String cubeOld = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
     private ConstraintLayout constraintLayout;
 
-    /**
-     * going from 0 to 53, contains all of the center square numbers of a cube
-     */
-    private final int[] CENTER_SQUARE_NUMBERS = new int[]{4, 13, 22, 31, 40, 49};
-
     private ImageButton[] squares;
     private ImageButton[] colorChangers;
     private NavController navController;
@@ -128,9 +123,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
 
     private void onClickSquare(String viewName) {
         int squareNumber = Integer.parseInt(viewName.split("square")[1]);
-        if (!containsValue(CENTER_SQUARE_NUMBERS, squareNumber)) {
-            changeCubeStringAtIndexWithChar(squareNumber, SquareInfo.SIDE_COLORS[selectedColor.ordinal()]);
-        }
+        changeCubeStringAtIndexWithChar(squareNumber, SquareInfo.SIDE_COLORS[selectedColor.ordinal()]);
     }
 
     private void onClickColorChanger(String viewName) {
@@ -220,10 +213,8 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
      */
     private void onClickReset() {
         for (int i = 0; i < squares.length; i++) {
-            if(!containsValue(CENTER_SQUARE_NUMBERS, i)) {
-                String CUBE_START_POSITION = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
-                viewModel.setCube(CUBE_START_POSITION);
-            }
+            String CUBE_START_POSITION = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
+            viewModel.setCube(CUBE_START_POSITION);
         }
     }
 
