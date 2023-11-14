@@ -31,7 +31,23 @@
     <string name="take_photo">Take Photo</string>
     <string name="title_capture">Capture</string>
     <string name="capture_image">Capture image</string>
-    <string name="image_text_1">First image\nWhite on top\nRed on the left</string>
-    <string name="image_text_2">Second image\nYellow on top\nGreen on the left</string>
+    <string name="image_text_1">
+        First image\n
+        White on top\n
+        Red on the left
+    </string>
+    <string name="image_text_2">
+        Second image\n
+        Yellow on top\n
+        Green on the left
+    </string>
+    <string name="guide_capture_image">
+        Capture 2 images.\n
+        1. image: WHITE is on TOP AND RED is on the LEFT.\n
+        2. image: YELLOW is on TOP AND GREEN is on the LEFT.\n
+        Aim the cube between the lines.\n
+        Aim the 3 sides so that they are separated with the inner lines.\n
+        The images should be well lit and one should avoid shadows or glare.
+    </string>
 
 </resources>

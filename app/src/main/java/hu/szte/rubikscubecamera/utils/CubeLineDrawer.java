@@ -73,12 +73,6 @@ public class CubeLineDrawer {
         drawLine(canvas, M, LU);
         drawLine(canvas, M, RU);
         drawLine(canvas, M, D);
-        draw2ParallelLines(canvas, LU, LD, M, D);
-        draw2ParallelLines(canvas, LU, M, LD, D);
-        draw2ParallelLines(canvas, M, D, RU, RD);
-        draw2ParallelLines(canvas, M, RU, D, RD);
-        draw2ParallelLines(canvas, LU, U, M, RU);
-        draw2ParallelLines(canvas, LU, M, U, RU);
     }
 
     /**

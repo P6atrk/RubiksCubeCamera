@@ -56,7 +56,7 @@ public class CaptureFragment extends Fragment {
     private PreviewView previewView;
     private SurfaceView surfaceView;
     private SurfaceHolder surfaceHolder;
-    private MultiAutoCompleteTextView imageText;
+    private TextView imageText;
     private Button imageCaptureButton;
     private View root;
 
