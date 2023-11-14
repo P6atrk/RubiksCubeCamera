@@ -19,8 +19,8 @@ public class GuideActivity extends AppCompatActivity {
         Toolbar guideToolbar = (Toolbar) findViewById(R.id.guide_toolbar);
         setSupportActionBar(guideToolbar);
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        getSupportActionBar().setHomeButtonEnabled(false);
     }
 
     @Override

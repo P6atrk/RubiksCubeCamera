@@ -1,9 +1,12 @@
 package hu.szte.rubikscubecamera;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -19,15 +22,21 @@ import java.util.Objects;
 import hu.szte.rubikscubecamera.databinding.ActivityMainBinding;
 import hu.szte.rubikscubecamera.ui.guide.GuideActivity;
 
+
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    private static final String FIRST_TIME_KEY = "isFirstTime";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        // Check if it's the first time the app is opened
+        SharedPreferences preferences = getSharedPreferences("PrefsFile", MODE_PRIVATE);
+        boolean isFirstTime = preferences.getBoolean(FIRST_TIME_KEY, true);
+
+        hu.szte.rubikscubecamera.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding.getRoot();
         setContentView(binding.getRoot());
 
         Toolbar mainToolbar = findViewById(R.id.main_toolbar);
@@ -42,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        if (isFirstTime) {
+            preferences.edit().putBoolean(FIRST_TIME_KEY, false).apply();
+            startActivity(new Intent(MainActivity.this, GuideActivity.class));
+        }
     }
 
     @Override
