@@ -49,26 +49,30 @@ import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCaptureBinding;
 import hu.szte.rubikscubecamera.utils.CubeLineDrawer;
 
+/**
+ * The user can take 2 pictures here. 1 for each half of the cube.
+ * Displays the outline of a cube. The user has to position their
+ * cube into the outline.
+ * There is some text which guides the user.
+ * There is also a button with which the pictures can be taken.
+ */
 public class CaptureFragment extends Fragment {
 
     private FragmentCaptureBinding binding;
-
     private PreviewView previewView;
     private TextView imageText;
     private Button imageCaptureButton;
     private View root;
 
+    private boolean secondImage = false;
+
     private final Executor executor = Executors.newSingleThreadExecutor();
-
     private final int REQUEST_CODE_PERMISSIONS = 1010;
-
 
     private static final String[] REQUIRED_PERMISSIONS = {
             Manifest.permission.CAMERA,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
-
-    private boolean secondImage = false;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +126,9 @@ public class CaptureFragment extends Fragment {
         return root;
     }
 
+    /**
+     * If all permissions are granted, the camera will start with this function.
+     */
     private void startCamera() {
         final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity());
 
@@ -135,6 +142,11 @@ public class CaptureFragment extends Fragment {
         }, ContextCompat.getMainExecutor(requireActivity()));
     }
 
+    /**
+     * Creates the camera with all of its functions.
+     *
+     * @param cameraProvider All the functions attach to this cameraProvider.
+     */
     void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
         Preview preview = new Preview.Builder()
                 .setTargetResolution(new Size(720, 960))
@@ -179,7 +191,6 @@ public class CaptureFragment extends Fragment {
                             stopCamera(cameraProvider);
                         }
                     });
-
                 }
 
                 @Override
@@ -190,11 +201,21 @@ public class CaptureFragment extends Fragment {
         });
     }
 
+    /**
+     * Stops the camera and goes back to the previous fragment.
+     *
+     * @param cameraProvider This is the camera that needs to be stopped.
+     */
     private void stopCamera(@NonNull ProcessCameraProvider cameraProvider) {
         cameraProvider.unbindAll();
         Navigation.findNavController(root).popBackStack();
     }
 
+    /**
+     * Checks for the all permissions.
+     *
+     * @return returns true if all the permissions were granted.
+     */
     private boolean allPermissionsGranted() {
         for (String permission : REQUIRED_PERMISSIONS) {
             if (ContextCompat.checkSelfPermission(requireActivity(), permission) != PackageManager.PERMISSION_GRANTED) {
@@ -204,6 +225,10 @@ public class CaptureFragment extends Fragment {
         return true;
     }
 
+    /**
+     * Requests the permissions if they weren't granted already, if they are granted now,
+     * the camera will start up.
+     */
     private final ActivityResultLauncher<String[]> requestMultiplePermissionsLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),
             permissions -> {

@@ -2,6 +2,9 @@ package hu.szte.rubikscubecamera.utils;
 
 import org.opencv.core.Scalar;
 
+/**
+ * Stores useful information about the squares and colors.
+ */
 public class SquareInfo {
     public enum Color {
         WHITE,

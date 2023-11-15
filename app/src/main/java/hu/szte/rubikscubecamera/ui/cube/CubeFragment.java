@@ -18,7 +18,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,6 +27,15 @@ import hu.szte.rubikscubecamera.databinding.FragmentCubeBinding;
 import hu.szte.rubikscubecamera.utils.KociembaImpl;
 import hu.szte.rubikscubecamera.utils.SquareInfo;
 
+/**
+ * Represents the cube using images of colors.
+ * If in the previous fragment the user generates a cube from the image,
+ * the user will be taken to this fragment. The generated cube will be represented here.
+ * Has 3 buttons.
+ * The first one solves the cube if the representation is correct.
+ * The second reset the cube to its original state.
+ * The third one randomizes the representation.
+ */
 public class CubeFragment extends Fragment implements View.OnClickListener {
     private FragmentCubeBinding binding;
     private MainViewModel viewModel;
@@ -61,31 +69,37 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         squares = setOnClickListenerForSquares();
         setOnClickListenerForColorChangers();
 
-        // only "cubeString" is stored in arguments
         if (getArguments() != null) {
             String cubeString = getArguments().getString("cubeString");
-            setCubeByImage(cubeString);
+            setCubeByString(cubeString);
         }
 
         return root;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
-
+    /**
+     * Randomizes the cube, also setting the cubeString to that random cube.
+     */
     private void randomizeCube() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> viewModel.setCube(KociembaImpl.randomCube()));
     }
 
-    private void setCubeByImage(String cubeString) {
+    /**
+     * Sets the cube using the cubeString variable.
+     *
+     * @param cubeString The string representation of the cube.
+     */
+    private void setCubeByString(String cubeString) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> viewModel.setCube(cubeString));
     }
 
+    /**
+     * Solves the cube and posts the result to the solutionFragment.
+     *
+     * @param cube String representation of the cube on the screen.
+     */
     public void solveCube(String cube) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
@@ -115,6 +129,11 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    /**
+     * Manages all the onClick event of the cubeFragment.
+     *
+     * @param view the button which was clicked.
+     */
     @Override
     public void onClick(View view) {
         String viewName = view.getResources().getResourceName(view.getId()).split(":id/")[1];
@@ -128,15 +147,32 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * When a cube square is clicked by the user, this function saves the
+     * change into the cubeString.
+     *
+     * @param viewName the name of the square which was clicked.
+     */
     private void onClickSquare(String viewName) {
         int squareNumber = Integer.parseInt(viewName.split("square")[1]);
         changeCubeStringAtIndexWithChar(squareNumber, SquareInfo.SIDE_COLORS[selectedColor.ordinal()]);
     }
 
+    /**
+     * When the user clicks on a color from the 7 colors below the cube
+     * this function saves the clicked color.
+     *
+     * @param viewName The imageButton's name which the user clicked.
+     */
     private void onClickColorChanger(String viewName) {
         selectedColor = SquareInfo.Color.valueOf(viewName.split("colorChanger")[1].toUpperCase());
     }
 
+    /**
+     * Changes the square colors of every image in the CubeFragment.
+     *
+     * @param cubeNew The new string colors the the cube.
+     */
     private void changeAllSquareColor(String cubeNew) {
         SquareInfo.Color color = SquareInfo.Color.EMPTY;
         for (int i = 0; i < cubeNew.length(); i++) {
@@ -170,9 +206,9 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * sets an onClickListener to every square on the screen
+     * Sets an onClickListener to every square on the screen.
      *
-     * @return returns the imagebuttons that have an onclicklistener on them
+     * @return returns the imagebuttons that have an onclicklistener on them.
      */
     private ImageButton[] setOnClickListenerForSquares() {
         int SQUARE_COUNT = 54;
@@ -191,8 +227,8 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * sets an onclicklistener for the color changer squares. This onclicklistener is in
-     * the CubeFragment.java file onclick event
+     * Sets an onclicklistener for the color changer squares. This onclicklistener is in
+     * the CubeFragment.java file onclick event.
      */
     private void setOnClickListenerForColorChangers() {
         SquareInfo.Color[] colors = SquareInfo.Color.values();
@@ -209,10 +245,10 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * changes the one of the cube's chars at the index with the provided char
+     * Changes one of the cube's chars at the index with the provided char.
      *
-     * @param i  this is where the character will be changed
-     * @param ch the is the character it will be changed with
+     * @param i  This is where the character will be changed.
+     * @param ch This is the char that the other char will be changed with.
      */
     private void changeCubeStringAtIndexWithChar(int i, char ch) {
         String cubeVal = viewModel.getCube().getValue();
@@ -220,10 +256,10 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * changes to color of a square to the Color
+     * Gets the color image of the particular color and sets it to the image of the view.
      *
-     * @param view  square object
-     * @param color Color
+     * @param view  Square view. This view's image will be set to the color image.
+     * @param color Color of the image.
      */
     private void changeColor(View view, SquareInfo.Color color) {
         Context c = getContext();
@@ -232,7 +268,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     }
 
     /**
-     * resets every square to its initial value
+     * Resets every square to its initial value.
      */
     private void onClickReset() {
         for (int i = 0; i < squares.length; i++) {
@@ -250,5 +286,11 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
      */
     private String stringToCapitalized(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

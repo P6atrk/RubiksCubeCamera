@@ -20,7 +20,10 @@ import java.util.Objects;
 import hu.szte.rubikscubecamera.databinding.ActivityMainBinding;
 import hu.szte.rubikscubecamera.ui.guide.GuideActivity;
 
-
+/**
+ * Starting acvitity of the app. This activity contains
+ * every fragment.
+ */
 public class MainActivity extends AppCompatActivity {
     private static final String FIRST_TIME_KEY = "isFirstTime";
 
@@ -54,12 +57,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_nav_menu, menu);
-        return true;
-    }
-
+    /**
+     * If a MenuItem is selected, go to the correct activity.
+     * In this case, the only activity is the guideActivity.
+     *
+     * @param item This item was selected by the user.
+     * @return Returns true of selection was successful.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.navigation_guide) {
@@ -69,5 +73,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_nav_menu, menu);
+        return true;
     }
 }

@@ -15,6 +15,9 @@ import android.widget.TextView;
 import hu.szte.rubikscubecamera.MainViewModel;
 import hu.szte.rubikscubecamera.databinding.FragmentSolutionBinding;
 
+/**
+ * Displays the solution to the cube in the cubeFragment.
+ */
 public class SolutionFragment extends Fragment {
 
     private FragmentSolutionBinding binding;
