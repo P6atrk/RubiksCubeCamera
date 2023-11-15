@@ -11,7 +11,8 @@
         android:id="@+id/image1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#AAAAAA"
+        android:background="#656565"
+        android:contentDescription="@string/image_text_2"
         android:src="@drawable/cube_color_empty"
         android:tag="image1"
         app:layout_constraintBottom_toTopOf="@+id/image2"
@@ -26,7 +27,8 @@
         android:id="@+id/image2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#AAAAAA"
+        android:background="#656565"
+        android:contentDescription="@string/image_text_1"
         android:src="@drawable/cube_color_empty"
         android:tag="image2"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout4"
@@ -48,38 +50,21 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.85">
 
-        <LinearLayout
-            android:id="@+id/linearLayout3"
+        <ImageButton
+            android:id="@+id/buttonCamera"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingBottom="10dp">
-
-            <ImageButton
-                android:id="@+id/buttonCamera"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_photo_camera_24" />
-
-            <ImageButton
-                android:id="@+id/buttonBrowse"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_image_24" />
-
-            <ImageButton
-                android:id="@+id/buttonDelete"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/baseline_delete_24" />
-
-        </LinearLayout>
+            android:contentDescription="@string/capture_image"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:src="@drawable/baseline_photo_camera_24" />
 
         <Button
             android:id="@+id/buttonGenerate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/generate" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

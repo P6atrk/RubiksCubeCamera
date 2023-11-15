@@ -64,18 +64,9 @@ public class CameraFragment extends Fragment {
         image1 = binding.image1;
         image2 = binding.image2;
         ImageButton buttonCamera = binding.buttonCamera;
-        ImageButton buttonBrowse = binding.buttonBrowse;
-        ImageButton buttonDelete = binding.buttonDelete;
         Button buttonGenerate = binding.buttonGenerate;
 
-        browseActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                this::getImageFromBrowser
-        );
-
         buttonCamera.setOnClickListener(image -> takeImage());
-        buttonBrowse.setOnClickListener(image -> browseImage());
-        buttonDelete.setOnClickListener(image -> deleteImages());
         if (false) {
             buttonGenerate.setOnClickListener(button -> imageDecoderForDebugging(image1, image2));
         } else {
@@ -127,30 +118,6 @@ public class CameraFragment extends Fragment {
                 imageView2.setImageBitmap(convertMatToBitmap(mat2));
             });
         });
-    }
-
-    private void getImageFromBrowser(ActivityResult result) {
-        if (result.getResultCode() == Activity.RESULT_OK) {
-            Intent data = result.getData();
-            Uri selectedImageUri = null;
-            try {
-                assert data != null;
-                selectedImageUri = data.getData();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            if (null != selectedImageUri) {
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                            requireActivity().getContentResolver(),
-                            selectedImageUri);
-                    setImage(bitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
     }
 
     private List<Bitmap> getLastTwoBitmaps() {
@@ -210,15 +177,6 @@ public class CameraFragment extends Fragment {
     private void takeImage() {
         Navigation.findNavController(root)
                 .navigate(R.id.action_navigation_camera_to_navigation_capture);
-    }
-
-    private void browseImage() {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            browseActivityResultLauncher.launch(intent);
-        });
     }
 
     private void deleteImages() {
