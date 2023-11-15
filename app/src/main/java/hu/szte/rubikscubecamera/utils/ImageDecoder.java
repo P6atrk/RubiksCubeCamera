@@ -19,8 +19,19 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * Decodes the cube from the image.
+ * Also has some function which help in debugging.
+ */
 public class ImageDecoder {
 
+    /**
+     * Solves the cube and gives back a string representation.
+     *
+     * @param mat   The mat where the cube is.
+     * @param isURF Tells which image is the current one.
+     * @return String representation of the cube on the images.
+     */
     public static String solveImage(Mat mat, boolean isURF) {
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
         Mat cubeMask = createCubeMask(mat);
@@ -40,6 +51,14 @@ public class ImageDecoder {
         return rearrangeColorString(getMatSquareColors(matSquares), isURF);
     }
 
+    /**
+     * Used for debugging the solveImage function.
+     * Currently returns a mask which shows every blue color on the image.
+     *
+     * @param mat   The mat where the cube is.
+     * @param isURF Tells which image is the current one.
+     * @return A mask which shows every blue color on the image.
+     */
     public static Mat solveImageForDebugging(Mat mat, boolean isURF) {
         Imgproc.cvtColor(mat, mat, Imgproc.COLOR_BGRA2BGR);
         Mat cubeMask = createCubeMask(mat);
@@ -55,16 +74,16 @@ public class ImageDecoder {
         List<Mat> squareMasks = createSquareMasks(cubeMask, contours);
         List<Mat> matSquares = createMatSquares(mat, squareMasks);
 
-        //String colorsString = getMatSquareColors(matSquares);
-
-        //drawOnCubeSquares(mat, contours, hierarchy, colorsString);
-        //drawOnCubeSquares(mat, contours, hierarchy);
-
-        //return cubeMask;
-        //String colorString = rearrangeColorString(getMatSquareColors(matSquares), isURF);
         return getMatSquareColors(matSquares, SquareInfo.Color.BLUE.ordinal());
     }
 
+    /**
+     * Used for debugging. Draws the color texts on the image above the correct squares.
+     *
+     * @param mat          Mat to draw on.
+     * @param contours     The contours of the squares in the correct order.
+     * @param colorsString The colors of the squares.
+     */
     private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours, String colorsString) {
         int fontScale = 1;
         Scalar fontColor = new Scalar(255, 0, 0);
@@ -78,6 +97,13 @@ public class ImageDecoder {
         }
     }
 
+    /**
+     * Used for debugging. Draws the number on the cube squares.
+     * This number represents their place in the contours list.
+     *
+     * @param mat      Mat to draw on.
+     * @param contours Contours of the squares.
+     */
     private static void drawOnCubeSquares(Mat mat, List<MatOfPoint> contours) {
         int fontScale = 1;
         Scalar fontColor = new Scalar(255, 0, 0);
@@ -162,7 +188,7 @@ public class ImageDecoder {
         for (List<Mat> colorCounters : matSquareColorCounters) {
             int biggest = 0;
             for (int i = 1; i < colorCounters.size(); i++) {
-                int biggestCount =  Core.countNonZero(colorCounters.get(biggest));
+                int biggestCount = Core.countNonZero(colorCounters.get(biggest));
                 if (Core.countNonZero(colorCounters.get(i)) > biggestCount) {
                     biggest = i;
                 }

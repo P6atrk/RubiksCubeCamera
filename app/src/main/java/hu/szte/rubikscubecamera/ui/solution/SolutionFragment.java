@@ -15,23 +15,21 @@ import android.widget.TextView;
 import hu.szte.rubikscubecamera.MainViewModel;
 import hu.szte.rubikscubecamera.databinding.FragmentSolutionBinding;
 
+/**
+ * Displays the solution to the cube in the cubeFragment.
+ */
 public class SolutionFragment extends Fragment {
 
     private FragmentSolutionBinding binding;
 
-    private MainViewModel viewModel;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        MainViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding = FragmentSolutionBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
         final TextView textView = binding.textSolution;
-        viewModel.getResult().observe(getViewLifecycleOwner(), res -> {
-            System.out.println("SOLUTION: " + res);
-            textView.setText(res);
-        });
+        viewModel.getResult().observe(getViewLifecycleOwner(), textView::setText);
         return root;
     }
 

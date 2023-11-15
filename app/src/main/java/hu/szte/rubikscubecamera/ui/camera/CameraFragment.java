@@ -5,13 +5,9 @@ import static hu.szte.rubikscubecamera.utils.ImageDecoder.convertMatToBitmap;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImage;
 import static hu.szte.rubikscubecamera.utils.ImageDecoder.solveImageForDebugging;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,22 +16,17 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -45,13 +36,15 @@ import hu.szte.rubikscubecamera.MainViewModel;
 import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCameraBinding;
 
+/**
+ * Displays 2 images.
+ * 1 button is for taking the 2 pictures and the other button is for generating the cube.
+ */
 public class CameraFragment extends Fragment {
-    private final boolean DEBUGGING = true;
 
     private FragmentCameraBinding binding;
     private ImageView image1;
     private ImageView image2;
-    private ActivityResultLauncher<Intent> browseActivityResultLauncher;
     private ConstraintLayout cameraFragmentContainer;
     private View root;
 
@@ -65,35 +58,11 @@ public class CameraFragment extends Fragment {
         cameraFragmentContainer = binding.cameraFragmentContainer;
         image1 = binding.image1;
         image2 = binding.image2;
-
         ImageButton buttonCamera = binding.buttonCamera;
-        ImageButton buttonBrowse = binding.buttonBrowse;
-        ImageButton buttonDelete = binding.buttonDelete;
         Button buttonGenerate = binding.buttonGenerate;
 
-        browseActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        Uri selectedImageUri = data.getData();
-                        if (null != selectedImageUri) {
-                            try {
-                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                                        requireActivity().getContentResolver(),
-                                        selectedImageUri);
-                                setImage(bitmap);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }
-                });
-
         buttonCamera.setOnClickListener(image -> takeImage());
-        buttonBrowse.setOnClickListener(image -> browseImage());
-        buttonDelete.setOnClickListener(image -> deleteImages());
-        if(!DEBUGGING) {
+        if (false) {
             buttonGenerate.setOnClickListener(button -> imageDecoderForDebugging(image1, image2));
         } else {
             buttonGenerate.setOnClickListener(button -> imageDecoder(image1, image2));
@@ -104,12 +73,71 @@ public class CameraFragment extends Fragment {
         return root;
     }
 
-    @Override
-    public void onResume() {
-        setImages();
-        super.onResume();
+    /**
+     * Decodes the cube from the image and gives the result to
+     * the CubeFragment (which displays it).
+     * The function uses 2 imageViews, 1 image contains 3 sides of the cube.
+     *
+     * @param imageView1 The UFR side of the cube.
+     * @param imageView2 The DLB side of the cube.
+     */
+    private void imageDecoder(ImageView imageView1, ImageView imageView2) {
+        if (imageView1.getDrawable() == null || imageView1.getDrawable() == null) {
+            Toast.makeText(
+                    requireActivity(),
+                    "There are no images to decode.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            String cubeString;
+            cubeString = solveImage(convertImageViewToMat(imageView2), true)
+                    + solveImage(convertImageViewToMat(imageView1), false);
+
+            Bundle bundle = new Bundle();
+            bundle.putString("cubeString", cubeString);
+            cameraFragmentContainer.post(() ->
+                    Navigation.findNavController(root)
+                            .navigate(
+                                    R.id.action_navigation_camera_to_navigation_cube,
+                                    bundle,
+                                    new NavOptions.Builder()
+                                            .setPopUpTo(R.id.navigation_camera, true)
+                                            .build()
+                            )
+            );
+        });
     }
 
+    /**
+     * Was used for debugging the image decoding.
+     * Helps display the results of certain image manipulation stuff on
+     * the ImageViews.
+     *
+     * @param imageView1 The UFR side of the cube.
+     * @param imageView2 The DLB side of the cube.
+     */
+    private void imageDecoderForDebugging(ImageView imageView1, ImageView imageView2) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            Mat mat1 = solveImageForDebugging(convertImageViewToMat(imageView1), false);
+            Mat mat2 = solveImageForDebugging(convertImageViewToMat(imageView2), true);
+
+            cameraFragmentContainer.post(() -> {
+                imageView1.setImageBitmap(convertMatToBitmap(mat1));
+                imageView2.setImageBitmap(convertMatToBitmap(mat2));
+            });
+        });
+    }
+
+    /**
+     * Returns the last 2 bitmaps from the cache of the app.
+     * These 2 bitmaps are the last images the user has taken.
+     * These will be displayed on the cameraFragment in correct order.
+     *
+     * @return A list of 2 bitmaps.
+     */
     private List<Bitmap> getLastTwoBitmaps() {
         Bitmap bitmap1;
         Bitmap bitmap2;
@@ -117,7 +145,7 @@ public class CameraFragment extends Fragment {
         File[] files = cacheDir.listFiles();
         File largest = null;
         File secondLargest = null;
-        if (cacheDir.exists() && files != null && files.length > 2) {
+        if (cacheDir.exists() && files != null && files.length >= 2) {
             largest = files[0];
             secondLargest = files[1];
             if (files[0].lastModified() < files[1].lastModified()) {
@@ -145,50 +173,26 @@ public class CameraFragment extends Fragment {
         return list;
     }
 
-    private void imageDecoder(ImageView imageView1, ImageView imageView2) {
-        if(imageView1.getDrawable() == null || imageView1.getDrawable() == null) {
-            Toast.makeText(
-                    requireActivity(),
-                    "There are no images to decode.",
-                    Toast.LENGTH_LONG).show();
-            return;
+    /**
+     * Sets the images on the cameraFragment.
+     * If there is less than 2, it won't display any.
+     */
+    private void setImages() {
+        List<Bitmap> imageBitmaps = getLastTwoBitmaps();
+
+        deleteImages();
+
+        if (imageBitmaps.size() == 2) {
+            setImage(imageBitmaps.get(0));
+            setImage(imageBitmaps.get(1));
         }
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
-            cubeString = solveImage(convertImageViewToMat(imageView2), true)
-                    + solveImage(convertImageViewToMat(imageView1), false);
-            System.out.println("1234: " + cubeString);
-
-            Bundle bundle = new Bundle();
-            bundle.putString("cubeString", cubeString);
-            cameraFragmentContainer.post(() ->
-                    Navigation.findNavController(root)
-                            .navigate(
-                                    R.id.action_navigation_camera_to_navigation_cube,
-                                    bundle,
-                                    new NavOptions.Builder()
-                                            .setPopUpTo(R.id.navigation_camera, true)
-                                            .build()
-                            )
-            );
-        });
     }
 
-
-    private void imageDecoderForDebugging(ImageView imageView1, ImageView imageView2) {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            Mat mat1 = solveImageForDebugging(convertImageViewToMat(imageView1), false);
-            Mat mat2 = solveImageForDebugging(convertImageViewToMat(imageView2), true);
-
-            cameraFragmentContainer.post(() -> {
-                imageView1.setImageBitmap(convertMatToBitmap(mat1));
-                imageView2.setImageBitmap(convertMatToBitmap(mat2));
-            });
-        });
-    }
-
+    /**
+     * Sets a single image on the cameraFragment.
+     *
+     * @param bitmap Bitmap of the image to set.
+     */
     private void setImage(Bitmap bitmap) {
         if (image1.getDrawable() == null) {
             image1.setImageBitmap(bitmap);
@@ -197,34 +201,30 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    private void setImages() {
-        List<Bitmap> imageBitmaps = getLastTwoBitmaps();
-        deleteImages();
-        //Bitmap.createScaledBitmap(imageBitmaps.get(0), 960, 1080, false);
-        if (imageBitmaps.size() == 2) {
-            setImage(imageBitmaps.get(0));
-            setImage(imageBitmaps.get(1));
-        }
-    }
-
+    /**
+     * Navigates to the captureFragment, so the images can be taken.
+     */
     private void takeImage() {
         Navigation.findNavController(root)
-                .navigate(
-                        R.id.action_navigation_camera_to_navigation_capture);
+                .navigate(R.id.action_navigation_camera_to_navigation_capture);
     }
 
-    private void browseImage() {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            browseActivityResultLauncher.launch(intent);
-        });
-    }
-
+    /**
+     * Deletes both images on the cameraFragment.
+     * This won't delete them from the cache.
+     */
     private void deleteImages() {
         image1.setImageResource(0);
         image2.setImageResource(0);
+    }
+
+    /**
+     * If the fragment is resumed the images will be set automatically.
+     */
+    @Override
+    public void onResume() {
+        setImages();
+        super.onResume();
     }
 
     @Override

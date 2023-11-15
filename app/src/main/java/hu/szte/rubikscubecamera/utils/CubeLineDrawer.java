@@ -10,6 +10,9 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 
+/**
+ * Draws the inner and outer lines of a cube onto a canvas and a mat.
+ */
 public class CubeLineDrawer {
     private static final double MD_LENGTH_FRACTION = 3.0;
     private static final double F1 = 1.0 / 3.0, F2 = 2.0 / 3.0;
@@ -19,10 +22,11 @@ public class CubeLineDrawer {
     private static Scalar color;
     private static int thickness = 40;
 
-    private static Point M, D , RU, LU, U, LD, RD;
+    private static Point M, D, RU, LU, U, LD, RD;
 
     /**
      * Draws the outer lines of the cube. Works with Canvas.
+     *
      * @param canvas canvas to draw on.
      */
     public static void drawOuterLines(Canvas canvas) {
@@ -41,6 +45,7 @@ public class CubeLineDrawer {
 
     /**
      * Draws the outer lines of the cube. Works with Mat.
+     *
      * @param mat Mat to draw on.
      */
     public static void drawOuterLines(Mat mat, Scalar color, int thickness) {
@@ -62,6 +67,8 @@ public class CubeLineDrawer {
 
     /**
      * Draws the inner lines of the cube. Works with Canvas.
+     * Only draws the 3 separator lines.
+     *
      * @param canvas Canvas to draw on.
      */
     public static void drawInnerLines(Canvas canvas) {
@@ -77,6 +84,7 @@ public class CubeLineDrawer {
 
     /**
      * Draws the inner lines of the cube. Works with Mat.
+     *
      * @param mat Mat to draw on.
      */
     public static void drawInnerLines(Mat mat, Scalar color, int thickness) {
@@ -96,29 +104,15 @@ public class CubeLineDrawer {
         draw2ParallelLines(mat, LU, M, U, RU);
     }
 
-
-    // TODO: Kommentelni es egyszeruseteni
     /**
+     * Draws 2 parallel lines between (p1, p2) and (p3, p4) lines.
+     * These lines are at the 1/3 and 2/3 points.
      *
-     * @param canvas
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     */
-    private static void draw2ParallelLines(Canvas canvas, Point p1, Point p2, Point p3, Point p4) {
-        drawLine(canvas, f(p1, p2, F1), f(p3, p4, F1));
-        drawLine(canvas, f(p1, p2, F2), f(p3, p4, F2));
-    }
-
-    // TODO: Kommentelni es egyszeruseteni
-    /**
-     *
-     * @param mat
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
+     * @param mat Mat to draw on.
+     * @param p1  First point of the first line.
+     * @param p2  Second point of the first line.
+     * @param p3  First point of the second line.
+     * @param p4  Second point of the second line.
      */
     private static void draw2ParallelLines(Mat mat, Point p1, Point p2, Point p3, Point p4) {
         drawLine(mat, f(p1, p2, F1), f(p3, p4, F1));
@@ -127,9 +121,10 @@ public class CubeLineDrawer {
 
     /**
      * Draws a single line on the Canvas.
+     *
      * @param canvas Canvas to draw on.
-     * @param p1 Point1, Starting point of the line.
-     * @param p2 Point2, Ending point of the line.
+     * @param p1     Point1, Starting point of the line.
+     * @param p2     Point2, Ending point of the line.
      */
     private static void drawLine(Canvas canvas, Point p1, Point p2) {
         canvas.drawLine((float) p1.x, (float) p1.y, (float) p2.x, (float) p2.y, paint);
@@ -137,9 +132,10 @@ public class CubeLineDrawer {
 
     /**
      * Draws a single line on the Mat.
+     *
      * @param mat Mat to draw on.
-     * @param p1 Point1, Starting point of the line.
-     * @param p2 Point2, Ending point of the line.
+     * @param p1  Point1, Starting point of the line.
+     * @param p2  Point2, Ending point of the line.
      */
     private static void drawLine(Mat mat, Point p1, Point p2) {
         line(mat, p1, p2, color, thickness);
@@ -176,25 +172,25 @@ public class CubeLineDrawer {
      * The fraction is calculated from the first point (x1, y1),
      * so If the fraction is 1/3 than the point will be closer to (x1, y1).
      *
-     * @param point1 OpenCv Point point1
-     * @param point2 OpenCv Point point2
-     * @param f  fraction
-     * @return an OpenCv Point
+     * @param point1 OpenCv Point point1.
+     * @param point2 OpenCv Point point2.
+     * @param f      Fraction.
+     * @return An OpenCv Point.
      */
     private static Point f(Point point1, Point point2, double f) {
         return new Point(point1.x + f * (point2.x - point1.x), point1.y + f * (point2.y - point1.y));
     }
 
-    // TODO: Kommentelni es egyszeruseteni
     /**
+     * Rotates a point around a pivot point in a coordinate system and gives back the
+     * rotated point's coordinates.
      *
-     * @param pivot
-     * @param point
-     * @param angleDegrees
-     * @return
+     * @param pivot        The pivot point.
+     * @param point        The point which is being rotated around.
+     * @param angleDegrees The angles which with the point is rotated.
+     * @return Point coordinates of the rotated point.
      */
     private static Point rotatePointAroundPoint(Point pivot, Point point, double angleDegrees) {
-        // Convert the angle from degrees to radians
         double angleRadians = angleDegrees * (Math.PI / 180);
         double cosTheta = Math.cos(angleRadians);
         double sinTheta = Math.sin(angleRadians);
@@ -204,13 +200,13 @@ public class CubeLineDrawer {
                 (int) (sinTheta * (point.x - pivot.x) + cosTheta * (point.y - pivot.y) + pivot.y));
     }
 
-    // TODO: Kommentelni es egyszerusiteni
     /**
+     * Reflects a point around a line.
      *
-     * @param point
-     * @param linePoint1
-     * @param linePoint2
-     * @return
+     * @param point      Point which is reflected.
+     * @param linePoint1 The first point of the line.
+     * @param linePoint2 The second point of the line.
+     * @return A point which is reflected around the line.
      */
     public static Point reflectPointAboutLine(Point point, Point linePoint1, Point linePoint2) {
         double dx = linePoint2.x - linePoint1.x;

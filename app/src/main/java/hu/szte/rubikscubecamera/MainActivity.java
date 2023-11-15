@@ -3,12 +3,8 @@ package hu.szte.rubikscubecamera;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -17,23 +13,23 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.Objects;
 
 import hu.szte.rubikscubecamera.databinding.ActivityMainBinding;
 import hu.szte.rubikscubecamera.ui.guide.GuideActivity;
 
-
+/**
+ * Starting acvitity of the app. This activity contains
+ * every fragment.
+ */
 public class MainActivity extends AppCompatActivity {
-
     private static final String FIRST_TIME_KEY = "isFirstTime";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Check if it's the first time the app is opened
-        SharedPreferences preferences = getSharedPreferences("PrefsFile", MODE_PRIVATE);
-        boolean isFirstTime = preferences.getBoolean(FIRST_TIME_KEY, true);
 
         hu.szte.rubikscubecamera.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         binding.getRoot();
@@ -52,18 +48,22 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
+        SharedPreferences preferences = getSharedPreferences("PrefsFile", MODE_PRIVATE);
+        boolean isFirstTime = preferences.getBoolean(FIRST_TIME_KEY, true);
+
         if (isFirstTime) {
             preferences.edit().putBoolean(FIRST_TIME_KEY, false).apply();
             startActivity(new Intent(MainActivity.this, GuideActivity.class));
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_nav_menu, menu);
-        return true;
-    }
-
+    /**
+     * If a MenuItem is selected, go to the correct activity.
+     * In this case, the only activity is the guideActivity.
+     *
+     * @param item This item was selected by the user.
+     * @return Returns true of selection was successful.
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.navigation_guide) {
@@ -73,5 +73,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_nav_menu, menu);
+        return true;
     }
 }

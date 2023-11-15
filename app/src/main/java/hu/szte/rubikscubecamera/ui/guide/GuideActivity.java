@@ -9,6 +9,10 @@ import java.util.Objects;
 
 import hu.szte.rubikscubecamera.R;
 
+/**
+ * Has a small guide for the user.
+ * Tells the user about the dos and don'ts of the app.
+ */
 public class GuideActivity extends AppCompatActivity {
 
     @Override
@@ -19,7 +23,7 @@ public class GuideActivity extends AppCompatActivity {
         Toolbar guideToolbar = (Toolbar) findViewById(R.id.guide_toolbar);
         setSupportActionBar(guideToolbar);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayShowHomeEnabled(false);
         getSupportActionBar().setHomeButtonEnabled(false);
     }
 
