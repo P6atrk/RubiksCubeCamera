@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -37,9 +38,9 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private View root;
 
     private ImageButton[] squares;
-    private ImageButton[] colorChangers;
 
     private SquareInfo.Color selectedColor = SquareInfo.Color.RED;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
@@ -51,24 +52,21 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
         final Button buttonRandomize = binding.buttonRandomize;
         constraintLayout = binding.cubeFragmentContrainstLayout;
 
-        viewModel.getCube().observe(getViewLifecycleOwner(), cube -> {
-            System.out.println("CUBE CREATE: " + cube);
-            changeAllSquareColor(cube);
-        });
+        viewModel.getCube().observe(getViewLifecycleOwner(), this::changeAllSquareColor);
 
         buttonSolveCube.setOnClickListener(a -> solveCube(viewModel.getCube().getValue()));
         buttonReset.setOnClickListener(this);
         buttonRandomize.setOnClickListener(a -> randomizeCube());
 
         squares = setOnClickListenerForSquares();
-        colorChangers = setOnClickListenerForColorChangers();
+        setOnClickListenerForColorChangers();
 
         // only "cubeString" is stored in arguments
-        if(getArguments() != null) {
+        if (getArguments() != null) {
             String cubeString = getArguments().getString("cubeString");
             setCubeByImage(cubeString);
         }
-      
+
         return root;
     }
 
@@ -80,26 +78,21 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
 
     private void randomizeCube() {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            viewModel.setCube(KociembaImpl.randomCube());
-        });
+        executorService.execute(() -> viewModel.setCube(KociembaImpl.randomCube()));
     }
 
     private void setCubeByImage(String cubeString) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            viewModel.setCube(cubeString);
-        });
+        executorService.execute(() -> viewModel.setCube(cubeString));
     }
 
     public void solveCube(String cube) {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(() -> {
             String result = KociembaImpl.solveCube(cube);
-            if(KociembaImpl.verifyCube(cube)) {
+            if (KociembaImpl.verifyCube(cube)) {
                 constraintLayout.post(() -> {
                     viewModel.setResult(result);
-                    System.out.println("CUBE SOLVED: " + result);
                     Navigation.findNavController(root)
                             .navigate(
                                     R.id.action_navigation_cube_to_navigation_solution,
@@ -112,13 +105,11 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
                 });
             } else {
                 new Handler(Looper.getMainLooper())
-                        .post(() -> {
-                    System.out.println("CUBE WRONG: " + result);
-                    Toast.makeText(
-                    requireActivity(),
-                    "Some squares on the cube are wrong. Check for mistakes.",
-                    Toast.LENGTH_LONG).show();
-                });
+                        .post(() -> Toast.makeText(
+                                requireActivity(),
+                                "Some squares on the cube are wrong. Check for mistakes.",
+                                Toast.LENGTH_LONG).show()
+                        );
             }
         });
 
@@ -128,7 +119,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         String viewName = view.getResources().getResourceName(view.getId()).split(":id/")[1];
         String RESET_NAME = "buttonReset";
-        if(viewName.startsWith(SQUARE_NAME)) {
+        if (viewName.startsWith(SQUARE_NAME)) {
             onClickSquare(viewName);
         } else if (viewName.startsWith(COLOR_CHANGER_NAME)) {
             onClickColorChanger(viewName);
@@ -149,15 +140,29 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     private void changeAllSquareColor(String cubeNew) {
         SquareInfo.Color color = SquareInfo.Color.EMPTY;
         for (int i = 0; i < cubeNew.length(); i++) {
-            if(cubeOld.charAt(i) == cubeNew.charAt(i)) continue;
+            if (cubeOld.charAt(i) == cubeNew.charAt(i)) continue;
             switch (cubeNew.charAt(i)) {
-                case 'U': color = SquareInfo.Color.WHITE; break;
-                case 'R': color = SquareInfo.Color.BLUE; break;
-                case 'F': color = SquareInfo.Color.RED; break;
-                case 'D': color = SquareInfo.Color.YELLOW; break;
-                case 'L': color = SquareInfo.Color.GREEN; break;
-                case 'B': color = SquareInfo.Color.ORANGE; break;
-                case 'E': color = SquareInfo.Color.EMPTY; break;
+                case 'U':
+                    color = SquareInfo.Color.WHITE;
+                    break;
+                case 'R':
+                    color = SquareInfo.Color.BLUE;
+                    break;
+                case 'F':
+                    color = SquareInfo.Color.RED;
+                    break;
+                case 'D':
+                    color = SquareInfo.Color.YELLOW;
+                    break;
+                case 'L':
+                    color = SquareInfo.Color.GREEN;
+                    break;
+                case 'B':
+                    color = SquareInfo.Color.ORANGE;
+                    break;
+                case 'E':
+                    color = SquareInfo.Color.EMPTY;
+                    break;
             }
             changeColor(squares[i], color);
         }
@@ -166,6 +171,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
 
     /**
      * sets an onClickListener to every square on the screen
+     *
      * @return returns the imagebuttons that have an onclicklistener on them
      */
     private ImageButton[] setOnClickListenerForSquares() {
@@ -175,6 +181,7 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
             String squareName = SQUARE_NAME + i;
             try {
                 squares[i] = (ImageButton) binding.getClass().getDeclaredField(squareName).get(binding);
+                assert squares[i] != null;
                 squares[i].setOnClickListener(this);
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 throw new RuntimeException(e);
@@ -186,26 +193,25 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     /**
      * sets an onclicklistener for the color changer squares. This onclicklistener is in
      * the CubeFragment.java file onclick event
-     * @return colorChanger ImageButtons that have an onclicklistener
      */
-    private ImageButton[] setOnClickListenerForColorChangers() {
+    private void setOnClickListenerForColorChangers() {
         SquareInfo.Color[] colors = SquareInfo.Color.values();
-        ImageButton[] colorChangers = new ImageButton[colors.length];
-        for (int i = 0; i < colors.length; i++) {
-            String colorChangerName = COLOR_CHANGER_NAME + stringToCapitalized(colors[i].name());;
+        for (SquareInfo.Color color : colors) {
+            String colorChangerName = COLOR_CHANGER_NAME + stringToCapitalized(color.name());
             try {
-                colorChangers[i] = (ImageButton) binding.getClass().getDeclaredField(colorChangerName).get(binding);
-                colorChangers[i].setOnClickListener(this);
-            } catch (IllegalAccessException | NoSuchFieldException e) {
-                throw new RuntimeException(e);
+                ImageButton currentButton = (ImageButton) (binding.getClass().getDeclaredField(colorChangerName).get(binding));
+                assert currentButton != null;
+                currentButton.setOnClickListener(this);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
-        return colorChangers;
     }
 
     /**
      * changes the one of the cube's chars at the index with the provided char
-     * @param i this is where the character will be changed
+     *
+     * @param i  this is where the character will be changed
      * @param ch the is the character it will be changed with
      */
     private void changeCubeStringAtIndexWithChar(int i, char ch) {
@@ -215,7 +221,8 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
 
     /**
      * changes to color of a square to the Color
-     * @param view square object
+     *
+     * @param view  square object
      * @param color Color
      */
     private void changeColor(View view, SquareInfo.Color color) {
@@ -237,25 +244,11 @@ public class CubeFragment extends Fragment implements View.OnClickListener {
     /**
      * Capitalizes a word.
      * FIRST -> First, second -> Second, tHr33 -> Thr33
+     *
      * @param str word to capitalize
      * @return a capitalized word
      */
     private String stringToCapitalized(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
-    }
-
-    /**
-     * checks if a int array contains a specific value
-     * @param array to be examined
-     * @param value to search for
-     * @return boolean, true if array contains value, false if not
-     */
-    private boolean containsValue(int[] array, int value) {
-        for (int val : array) {
-            if (val == value) {
-                return true;
-            }
-        }
-        return false;
     }
 }

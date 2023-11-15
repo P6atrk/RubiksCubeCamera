@@ -55,13 +55,6 @@ public class ImageDecoder {
         List<Mat> squareMasks = createSquareMasks(cubeMask, contours);
         List<Mat> matSquares = createMatSquares(mat, squareMasks);
 
-        //String colorsString = getMatSquareColors(matSquares);
-
-        //drawOnCubeSquares(mat, contours, hierarchy, colorsString);
-        //drawOnCubeSquares(mat, contours, hierarchy);
-
-        //return cubeMask;
-        //String colorString = rearrangeColorString(getMatSquareColors(matSquares), isURF);
         return getMatSquareColors(matSquares, SquareInfo.Color.BLUE.ordinal());
     }
 
@@ -162,7 +155,7 @@ public class ImageDecoder {
         for (List<Mat> colorCounters : matSquareColorCounters) {
             int biggest = 0;
             for (int i = 1; i < colorCounters.size(); i++) {
-                int biggestCount =  Core.countNonZero(colorCounters.get(biggest));
+                int biggestCount = Core.countNonZero(colorCounters.get(biggest));
                 if (Core.countNonZero(colorCounters.get(i)) > biggestCount) {
                     biggest = i;
                 }

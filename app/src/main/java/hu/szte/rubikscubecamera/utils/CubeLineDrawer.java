@@ -96,30 +96,11 @@ public class CubeLineDrawer {
         draw2ParallelLines(mat, LU, M, U, RU);
     }
 
-
-    // TODO: Kommentelni es egyszeruseteni
-    /**
-     *
-     * @param canvas
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     */
     private static void draw2ParallelLines(Canvas canvas, Point p1, Point p2, Point p3, Point p4) {
         drawLine(canvas, f(p1, p2, F1), f(p3, p4, F1));
         drawLine(canvas, f(p1, p2, F2), f(p3, p4, F2));
     }
 
-    // TODO: Kommentelni es egyszeruseteni
-    /**
-     *
-     * @param mat
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     */
     private static void draw2ParallelLines(Mat mat, Point p1, Point p2, Point p3, Point p4) {
         drawLine(mat, f(p1, p2, F1), f(p3, p4, F1));
         drawLine(mat, f(p1, p2, F2), f(p3, p4, F2));
@@ -185,16 +166,7 @@ public class CubeLineDrawer {
         return new Point(point1.x + f * (point2.x - point1.x), point1.y + f * (point2.y - point1.y));
     }
 
-    // TODO: Kommentelni es egyszeruseteni
-    /**
-     *
-     * @param pivot
-     * @param point
-     * @param angleDegrees
-     * @return
-     */
     private static Point rotatePointAroundPoint(Point pivot, Point point, double angleDegrees) {
-        // Convert the angle from degrees to radians
         double angleRadians = angleDegrees * (Math.PI / 180);
         double cosTheta = Math.cos(angleRadians);
         double sinTheta = Math.sin(angleRadians);
@@ -204,14 +176,6 @@ public class CubeLineDrawer {
                 (int) (sinTheta * (point.x - pivot.x) + cosTheta * (point.y - pivot.y) + pivot.y));
     }
 
-    // TODO: Kommentelni es egyszerusiteni
-    /**
-     *
-     * @param point
-     * @param linePoint1
-     * @param linePoint2
-     * @return
-     */
     public static Point reflectPointAboutLine(Point point, Point linePoint1, Point linePoint2) {
         double dx = linePoint2.x - linePoint1.x;
         double dy = linePoint2.y - linePoint1.y;

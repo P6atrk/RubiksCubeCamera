@@ -9,7 +9,8 @@ public class KociembaImpl {
     private static final long PROBE_MAX = 100000000L;
     private static final long PROBE_MIN = 0L;
     private static final int MAX_DEPTH = 21;
-    private  static final int VERBOSE = 0;
+    private static final int VERBOSE = 0;
+
     public static String solveCubeRandom() {
         Search.init();
         String cube = randomCube();

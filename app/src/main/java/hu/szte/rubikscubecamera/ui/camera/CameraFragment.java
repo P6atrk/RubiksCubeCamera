@@ -20,16 +20,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
 import androidx.navigation.NavOptions;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
@@ -46,7 +45,6 @@ import hu.szte.rubikscubecamera.R;
 import hu.szte.rubikscubecamera.databinding.FragmentCameraBinding;
 
 public class CameraFragment extends Fragment {
-    private final boolean DEBUGGING = true;
 
     private FragmentCameraBinding binding;
     private ImageView image1;
@@ -65,35 +63,20 @@ public class CameraFragment extends Fragment {
         cameraFragmentContainer = binding.cameraFragmentContainer;
         image1 = binding.image1;
         image2 = binding.image2;
-
         ImageButton buttonCamera = binding.buttonCamera;
         ImageButton buttonBrowse = binding.buttonBrowse;
         ImageButton buttonDelete = binding.buttonDelete;
         Button buttonGenerate = binding.buttonGenerate;
 
-        browseActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        Uri selectedImageUri = data.getData();
-                        if (null != selectedImageUri) {
-                            try {
-                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                                        requireActivity().getContentResolver(),
-                                        selectedImageUri);
-                                setImage(bitmap);
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }
-                });
+        browseActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                this::getImageFromBrowser
+        );
 
         buttonCamera.setOnClickListener(image -> takeImage());
         buttonBrowse.setOnClickListener(image -> browseImage());
         buttonDelete.setOnClickListener(image -> deleteImages());
-        if(!DEBUGGING) {
+        if (false) {
             buttonGenerate.setOnClickListener(button -> imageDecoderForDebugging(image1, image2));
         } else {
             buttonGenerate.setOnClickListener(button -> imageDecoder(image1, image2));
@@ -104,10 +87,70 @@ public class CameraFragment extends Fragment {
         return root;
     }
 
-    @Override
-    public void onResume() {
-        setImages();
-        super.onResume();
+    private void imageDecoder(ImageView imageView1, ImageView imageView2) {
+        if (imageView1.getDrawable() == null || imageView1.getDrawable() == null) {
+            Toast.makeText(
+                    requireActivity(),
+                    "There are no images to decode.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            String cubeString;
+            cubeString = solveImage(convertImageViewToMat(imageView2), true)
+                    + solveImage(convertImageViewToMat(imageView1), false);
+
+            Bundle bundle = new Bundle();
+            bundle.putString("cubeString", cubeString);
+            cameraFragmentContainer.post(() ->
+                    Navigation.findNavController(root)
+                            .navigate(
+                                    R.id.action_navigation_camera_to_navigation_cube,
+                                    bundle,
+                                    new NavOptions.Builder()
+                                            .setPopUpTo(R.id.navigation_camera, true)
+                                            .build()
+                            )
+            );
+        });
+    }
+
+    private void imageDecoderForDebugging(ImageView imageView1, ImageView imageView2) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.execute(() -> {
+            Mat mat1 = solveImageForDebugging(convertImageViewToMat(imageView1), false);
+            Mat mat2 = solveImageForDebugging(convertImageViewToMat(imageView2), true);
+
+            cameraFragmentContainer.post(() -> {
+                imageView1.setImageBitmap(convertMatToBitmap(mat1));
+                imageView2.setImageBitmap(convertMatToBitmap(mat2));
+            });
+        });
+    }
+
+    private void getImageFromBrowser(ActivityResult result) {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            Intent data = result.getData();
+            Uri selectedImageUri = null;
+            try {
+                assert data != null;
+                selectedImageUri = data.getData();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (null != selectedImageUri) {
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(
+                            requireActivity().getContentResolver(),
+                            selectedImageUri);
+                    setImage(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
     }
 
     private List<Bitmap> getLastTwoBitmaps() {
@@ -145,48 +188,15 @@ public class CameraFragment extends Fragment {
         return list;
     }
 
-    private void imageDecoder(ImageView imageView1, ImageView imageView2) {
-        if(imageView1.getDrawable() == null || imageView1.getDrawable() == null) {
-            Toast.makeText(
-                    requireActivity(),
-                    "There are no images to decode.",
-                    Toast.LENGTH_LONG).show();
-            return;
+    private void setImages() {
+        List<Bitmap> imageBitmaps = getLastTwoBitmaps();
+
+        deleteImages();
+
+        if (imageBitmaps.size() == 2) {
+            setImage(imageBitmaps.get(0));
+            setImage(imageBitmaps.get(1));
         }
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            String cubeString = "EEEEUEEEEEEEEREEEEEEEEFEEEEEEEEDEEEEEEEELEEEEEEEEBEEEE";
-            cubeString = solveImage(convertImageViewToMat(imageView2), true)
-                    + solveImage(convertImageViewToMat(imageView1), false);
-            System.out.println("1234: " + cubeString);
-
-            Bundle bundle = new Bundle();
-            bundle.putString("cubeString", cubeString);
-            cameraFragmentContainer.post(() ->
-                    Navigation.findNavController(root)
-                            .navigate(
-                                    R.id.action_navigation_camera_to_navigation_cube,
-                                    bundle,
-                                    new NavOptions.Builder()
-                                            .setPopUpTo(R.id.navigation_camera, true)
-                                            .build()
-                            )
-            );
-        });
-    }
-
-
-    private void imageDecoderForDebugging(ImageView imageView1, ImageView imageView2) {
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.execute(() -> {
-            Mat mat1 = solveImageForDebugging(convertImageViewToMat(imageView1), false);
-            Mat mat2 = solveImageForDebugging(convertImageViewToMat(imageView2), true);
-
-            cameraFragmentContainer.post(() -> {
-                imageView1.setImageBitmap(convertMatToBitmap(mat1));
-                imageView2.setImageBitmap(convertMatToBitmap(mat2));
-            });
-        });
     }
 
     private void setImage(Bitmap bitmap) {
@@ -197,20 +207,9 @@ public class CameraFragment extends Fragment {
         }
     }
 
-    private void setImages() {
-        List<Bitmap> imageBitmaps = getLastTwoBitmaps();
-        deleteImages();
-        //Bitmap.createScaledBitmap(imageBitmaps.get(0), 960, 1080, false);
-        if (imageBitmaps.size() == 2) {
-            setImage(imageBitmaps.get(0));
-            setImage(imageBitmaps.get(1));
-        }
-    }
-
     private void takeImage() {
         Navigation.findNavController(root)
-                .navigate(
-                        R.id.action_navigation_camera_to_navigation_capture);
+                .navigate(R.id.action_navigation_camera_to_navigation_capture);
     }
 
     private void browseImage() {
@@ -231,5 +230,11 @@ public class CameraFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onResume() {
+        setImages();
+        super.onResume();
     }
 }

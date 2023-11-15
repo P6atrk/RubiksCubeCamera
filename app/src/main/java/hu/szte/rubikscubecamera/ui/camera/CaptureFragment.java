@@ -14,7 +14,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +40,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -54,15 +54,13 @@ public class CaptureFragment extends Fragment {
     private FragmentCaptureBinding binding;
 
     private PreviewView previewView;
-    private SurfaceView surfaceView;
-    private SurfaceHolder surfaceHolder;
     private TextView imageText;
     private Button imageCaptureButton;
     private View root;
 
-    private Executor executor = Executors.newSingleThreadExecutor();
+    private final Executor executor = Executors.newSingleThreadExecutor();
 
-    final private int REQUEST_CODE_PERMISSIONS = 1010;
+    private final int REQUEST_CODE_PERMISSIONS = 1010;
 
 
     private static final String[] REQUIRED_PERMISSIONS = {
@@ -77,7 +75,7 @@ public class CaptureFragment extends Fragment {
         binding = FragmentCaptureBinding.inflate(inflater, container, false);
         root = binding.getRoot();
 
-        if (((AppCompatActivity) getActivity()).getSupportActionBar() != null) {
+        if (((AppCompatActivity) Objects.requireNonNull(getActivity())).getSupportActionBar() != null) {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(false);
         }
@@ -86,19 +84,19 @@ public class CaptureFragment extends Fragment {
         imageText = binding.imageNumber;
         imageCaptureButton = binding.imageCaptureButton;
 
-        surfaceView = binding.surfaceView;
-        surfaceHolder = surfaceView.getHolder();
+        SurfaceView surfaceView = binding.surfaceView;
+        SurfaceHolder surfaceHolder = surfaceView.getHolder();
         surfaceView.setZOrderOnTop(true);
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
 
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(@NonNull SurfaceHolder surfaceHolder) {
-                if(!surfaceHolder.getSurface().isValid()) return;
+                if (!surfaceHolder.getSurface().isValid()) return;
 
                 Canvas canvas = surfaceHolder.lockCanvas();
 
-                if(canvas == null) return;
+                if (canvas == null) return;
                 CubeLineDrawer.drawInnerLines(canvas);
                 CubeLineDrawer.drawOuterLines(canvas);
 
@@ -106,10 +104,12 @@ public class CaptureFragment extends Fragment {
             }
 
             @Override
-            public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {}
+            public void surfaceChanged(@NonNull SurfaceHolder surfaceHolder, int i, int i1, int i2) {
+            }
 
             @Override
-            public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {}
+            public void surfaceDestroyed(@NonNull SurfaceHolder surfaceHolder) {
+            }
         });
 
         if (allPermissionsGranted()) {
@@ -119,7 +119,6 @@ public class CaptureFragment extends Fragment {
             requestMultiplePermissionsLauncher.launch(REQUIRED_PERMISSIONS);
         }
 
-
         return root;
     }
 
@@ -128,10 +127,8 @@ public class CaptureFragment extends Fragment {
 
         cameraProviderFuture.addListener(() -> {
             try {
-
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
                 bindPreview(cameraProvider);
-
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
             }
@@ -171,17 +168,17 @@ public class CaptureFragment extends Fragment {
                 public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                     new Handler(
                             Looper.getMainLooper()).post(() -> {
-                                Toast.makeText(
-                                        requireActivity(),
-                                        "Image Saved successfully",
-                                        Toast.LENGTH_SHORT).show();
-                                if(!secondImage) {
-                                    secondImage = true;
-                                    imageText.setText(R.string.image_text_2);
-                                } else {
-                                    stopCamera(cameraProvider);
-                                }
-                            });
+                        Toast.makeText(
+                                requireActivity(),
+                                "Image Saved successfully",
+                                Toast.LENGTH_SHORT).show();
+                        if (!secondImage) {
+                            secondImage = true;
+                            imageText.setText(R.string.image_text_2);
+                        } else {
+                            stopCamera(cameraProvider);
+                        }
+                    });
 
                 }
 
@@ -210,8 +207,8 @@ public class CaptureFragment extends Fragment {
     private final ActivityResultLauncher<String[]> requestMultiplePermissionsLauncher = registerForActivityResult(
             new ActivityResultContracts.RequestMultiplePermissions(),
             permissions -> {
-                for(boolean permission : permissions.values().toArray(new Boolean[0])) {
-                    if(!permission) {
+                for (boolean permission : permissions.values().toArray(new Boolean[0])) {
+                    if (!permission) {
                         Toast.makeText(requireActivity(), "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
                         requireActivity().finish();
                     }
