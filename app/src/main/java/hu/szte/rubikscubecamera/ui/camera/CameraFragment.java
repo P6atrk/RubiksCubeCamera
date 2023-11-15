@@ -145,7 +145,7 @@ public class CameraFragment extends Fragment {
         File[] files = cacheDir.listFiles();
         File largest = null;
         File secondLargest = null;
-        if (cacheDir.exists() && files != null && files.length > 2) {
+        if (cacheDir.exists() && files != null && files.length >= 2) {
             largest = files[0];
             secondLargest = files[1];
             if (files[0].lastModified() < files[1].lastModified()) {
