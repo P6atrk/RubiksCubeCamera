@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_camera"
+        android:icon="@drawable/baseline_photo_camera_24"
+        android:title="@string/title_camera" />
+    <item
+        android:id="@+id/navigation_cube"
+        android:icon="@drawable/baseline_grid_on_24"
+        android:title="@string/title_cube" />
+    <item
+        android:id="@+id/navigation_solution"
+        android:icon="@drawable/baseline_lightbulb_24"
+        android:title="@string/title_solution" />
+
+</menu>

@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">RubiksCubeCamera</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_camera">Camera</string>
+    <string name="title_solution">Solution</string>
+    <string name="title_cube">Cube</string>
+    <string name="title_guide">Guide</string>
+    <string name="title_activity_options">OptionsActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="title_activity_guide">GuideActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="reset">Reset</string>
+    <string name="randomize">Randomize</string>
+    <string name="solve_cube">Solve Cube</string>
+    <string name="solution_found">Solution found:</string>
+    <string name="generate">Generate</string>
+    <string name="title_capture">Capture</string>
+    <string name="capture_image">Capture image</string>
+    <string name="image_text_1">
+        First image\n
+        White on top\n
+        Red on the left
+    </string>
+    <string name="image_text_2">
+        Second image\n
+        Yellow on top\n
+        Green on the left
+    </string>
+    <string name="guide_capture_image">
+        Capture 2 images.\n
+        1. image: WHITE is on TOP AND RED is on the LEFT.\n
+        2. image: YELLOW is on TOP AND GREEN is on the LEFT.\n
+        Aim the cube between the lines.\n
+        Aim the 3 sides so that they are separated with the inner lines.\n
+        The images should be well lit and one should avoid shadows or glare.
+    </string>
+
+</resources>
